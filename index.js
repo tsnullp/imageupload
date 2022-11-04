@@ -46,8 +46,11 @@ app.post('/upload', async (req, res) => {
             randomStr = Math.random().toString(36).substring(2, 12);
             fileName = path.join(today, `${randomStr}.jpg`)
           }
-
-          const bitmap = new Buffer(req.body.base64str, 'base64');  
+          let base64String = req.body.base64str
+          if(base64String.includes("base64,")){
+            base64String = base64String.split("base64,")[1]
+          }
+          const bitmap = new Buffer(base64String, 'base64');  
           fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
           res.send({
               status: true,
@@ -80,8 +83,13 @@ app.post('/upload-multi', async(req, res) => {
                 randomStr = Math.random().toString(36).substring(2, 12);
                 fileName = path.join(today, `${randomStr}.jpg`)
               }
+
+              let base64String = item
+              if(base64String.includes("base64,")){
+                base64String = base64String.split("base64,")[1]
+              }
     
-              const bitmap = new Buffer(item, 'base64');  
+              const bitmap = new Buffer(base64String, 'base64');  
               fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
               data.push(`http://tsnullp.chickenkiller.com:5100/${today}/${randomStr}.jpg`)
             } catch(e){
