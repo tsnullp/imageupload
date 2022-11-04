@@ -52,7 +52,7 @@ app.post('/upload', async (req, res) => {
           res.send({
               status: true,
               message: '파일이 업로드 되었습니다.',
-              data: fileName
+              data: `today/${randomStr}.jpg`
           });
       }
   } catch (err) {
@@ -83,7 +83,7 @@ app.post('/upload-multi', async(req, res) => {
     
               const bitmap = new Buffer(item, 'base64');  
               fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
-              data.push(fileName)
+              data.push(`today/${randomStr}.jpg`)
             } catch(e){
 
             }
