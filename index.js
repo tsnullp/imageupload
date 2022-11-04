@@ -22,8 +22,9 @@ app.use(morgan('dev'));
 
 // 포트 설정
 const port = 5100;
+const UPLOAD = "upload"
 
-app.use(express.static('uploads'));
+app.use(express.static(UPLOAD));
 app.listen(port, () => {
     console.log(`Server is on port ${port}.`);
 })
@@ -37,16 +38,17 @@ app.post('/upload', async (req, res) => {
           });
       } else {
           const today = moment().format("YYYYMMDD")
-          !fs.existsSync(path.join("uploads", today)) && fs.mkdirSync(path.join("uploads", today))
+          !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
+          !fs.existsSync(path.join(UPLOAD, today)) && fs.mkdirSync(path.join(UPLOAD, today))
           let randomStr = Math.random().toString(36).substring(2, 12);
           let fileName = path.join(today, `${randomStr}.jpg`)
-          while(fs.existsSync(path.join("uploads", fileName))){
+          while(fs.existsSync(path.join(UPLOAD, fileName))){
             randomStr = Math.random().toString(36).substring(2, 12);
             fileName = path.join(today, `${randomStr}.jpg`)
           }
 
           const bitmap = new Buffer(req.body.base64str, 'base64');  
-          fs.writeFileSync(path.join("uploads", fileName), bitmap)
+          fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
           res.send({
               status: true,
               message: '파일이 업로드 되었습니다.',
@@ -68,18 +70,19 @@ app.post('/upload-multi', async(req, res) => {
       } else {
           let data = [];
           const today = moment().format("YYYYMMDD")
-          !fs.existsSync(path.join("uploads", today)) && fs.mkdirSync(path.join("uploads", today))
+          !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
+          !fs.existsSync(path.join(UPLOAD, today)) && fs.mkdirSync(path.join(UPLOAD, today))
           for(const item of req.body.base64strs) {
             try {
               let randomStr = Math.random().toString(36).substring(2, 12);
               let fileName = path.join(today, `${randomStr}.jpg`)
-              while(fs.existsSync(path.join("uploads", fileName))){
+              while(fs.existsSync(path.join(UPLOAD, fileName))){
                 randomStr = Math.random().toString(36).substring(2, 12);
                 fileName = path.join(today, `${randomStr}.jpg`)
               }
     
               const bitmap = new Buffer(item, 'base64');  
-              fs.writeFileSync(path.join("uploads", fileName), bitmap)
+              fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
               data.push(fileName)
             } catch(e){
 
