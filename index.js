@@ -83,7 +83,7 @@ app.post('/upload-multi', async(req, res) => {
           console.log("base64strs", typeof req.body.base64strs)
           console.log("base64strs", req.body.base64strs.length)
           // const base64arr = JSON.parse(urlencode.decode(req.body.base64strs))
-          const base64arr = req.body.base64strs.split("IMG")
+          const base64arr = req.body.base64strs.split("PAPAGO_OCR")
           console.log("base64arr", typeof base64arr)
           console.log("base64arr", base64arr.length)
           if(Array.isArray(base64arr)){
