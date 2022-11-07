@@ -79,26 +79,20 @@ app.post('/upload-multi', async(req, res) => {
           const today = moment().format("YYYYMMDD")
           !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
           !fs.existsSync(path.join(UPLOAD, today)) && fs.mkdirSync(path.join(UPLOAD, today))
-          let i = 0
-          console.log("base64strs", typeof req.body.base64strs)
-          console.log("base64strs", req.body.base64strs.length)
-          // const base64arr = JSON.parse(urlencode.decode(req.body.base64strs))
+          
           const base64arr = req.body.base64strs.split("PAPAGO_OCR")
-          console.log("base64arr", typeof base64arr)
-          console.log("base64arr", base64arr.length)
           if(Array.isArray(base64arr)){
             for(const item of base64arr) {
-              console.log("item", item)
               if(item.length > 10){
                 try {
                   let randomStr = Math.random().toString(36).substring(2, 12);
                   let fileName = path.join(today, `${randomStr}.jpg`)
                   while(fs.existsSync(path.join(UPLOAD, fileName))){
-                    console.log("while", i, fileName)
+          
                     randomStr = Math.random().toString(36).substring(2, 12);
                     fileName = path.join(today, `${randomStr}.jpg`)
                   }
-                  console.log("iiii ", i++)
+          
                   let base64String = item
                   if(base64String.includes("base64,")){
                     base64String = base64String.split("base64,")[1]
