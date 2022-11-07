@@ -82,39 +82,47 @@ app.post('/upload-multi', async(req, res) => {
           let i = 0
           console.log("base64strs", typeof req.bodybase64strs)
           console.log("base64strs", req.body.base64strs.length)
-          const base64arr = JSON.parse(req.body.base64String)
+          const base64arr = JSON.parse(req.body.bodybase64strs)
           console.log("base64arr", typeof base64arr)
           console.log("base64arr", base64arr.length)
-          for(const item of base64arr) {
-            console.log("item", item)
-            try {
-              let randomStr = Math.random().toString(36).substring(2, 12);
-              let fileName = path.join(today, `${randomStr}.jpg`)
-              while(fs.existsSync(path.join(UPLOAD, fileName))){
-                console.log("while", i, fileName)
-                randomStr = Math.random().toString(36).substring(2, 12);
-                fileName = path.join(today, `${randomStr}.jpg`)
+          if(Array.isArray(base64arr)){
+            for(const item of base64arr) {
+              console.log("item", item)
+              try {
+                let randomStr = Math.random().toString(36).substring(2, 12);
+                let fileName = path.join(today, `${randomStr}.jpg`)
+                while(fs.existsSync(path.join(UPLOAD, fileName))){
+                  console.log("while", i, fileName)
+                  randomStr = Math.random().toString(36).substring(2, 12);
+                  fileName = path.join(today, `${randomStr}.jpg`)
+                }
+                console.log("iiii ", i++)
+                let base64String = item
+                if(base64String.includes("base64,")){
+                  base64String = base64String.split("base64,")[1]
+                }
+      
+                const bitmap = new Buffer(base64String, 'base64');  
+                fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
+                data.push(`http://tsnullp.chickenkiller.com:5100/${today}/${randomStr}.jpg`)
+              } catch(e){
+                console.log("에러--->", e)
               }
-              console.log("iiii ", i++)
-              let base64String = item
-              if(base64String.includes("base64,")){
-                base64String = base64String.split("base64,")[1]
-              }
-    
-              const bitmap = new Buffer(base64String, 'base64');  
-              fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
-              data.push(`http://tsnullp.chickenkiller.com:5100/${today}/${randomStr}.jpg`)
-            } catch(e){
-              console.log("에러--->", e)
             }
+  
+            // return response
+            res.send({
+                status: true,
+                message: '파일들이 업로드 되었습니다.',
+                data: data
+            });
+          } else {
+            res.send({
+              status: false,
+              message: "파일 업로드 실패"
+            })
           }
-
-          // return response
-          res.send({
-              status: true,
-              message: '파일들이 업로드 되었습니다.',
-              data: data
-          });
+         
       }
   } catch (err) {
       console.log("err00", err)
