@@ -17,9 +17,9 @@ app.use(fileUpload({
 // 미들 웨어 추가
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.json({limit: 0}))
+app.use(bodyParser.json({limit: "50000mb"}))
 app.use(bodyParser.urlencoded({
-  limit: 0,
+  limit: "50000mb",
   extended:true
 }));
 app.use(morgan('dev'));
