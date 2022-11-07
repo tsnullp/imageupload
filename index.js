@@ -78,15 +78,17 @@ app.post('/upload-multi', async(req, res) => {
           const today = moment().format("YYYYMMDD")
           !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
           !fs.existsSync(path.join(UPLOAD, today)) && fs.mkdirSync(path.join(UPLOAD, today))
+          let i = 0
           for(const item of req.body.base64strs) {
             try {
               let randomStr = Math.random().toString(36).substring(2, 12);
               let fileName = path.join(today, `${randomStr}.jpg`)
               while(fs.existsSync(path.join(UPLOAD, fileName))){
+                console.log("while", i, fileName)
                 randomStr = Math.random().toString(36).substring(2, 12);
                 fileName = path.join(today, `${randomStr}.jpg`)
               }
-
+              console.log("iiii ", i++)
               let base64String = item
               if(base64String.includes("base64,")){
                 base64String = base64String.split("base64,")[1]
@@ -96,7 +98,7 @@ app.post('/upload-multi', async(req, res) => {
               fs.writeFileSync(path.join(UPLOAD, fileName), bitmap)
               data.push(`http://tsnullp.chickenkiller.com:5100/${today}/${randomStr}.jpg`)
             } catch(e){
-
+              console.log("에러--->", e)
             }
           }
 
