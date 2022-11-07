@@ -80,9 +80,9 @@ app.post('/upload-multi', async(req, res) => {
           !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
           !fs.existsSync(path.join(UPLOAD, today)) && fs.mkdirSync(path.join(UPLOAD, today))
           let i = 0
-          console.log("base64strs", typeof req.bodybase64strs)
+          console.log("base64strs", typeof req.body.base64strs)
           console.log("base64strs", req.body.base64strs.length)
-          const base64arr = JSON.parse(req.body.bodybase64strs)
+          const base64arr = JSON.parse(req.body.base64strs)
           console.log("base64arr", typeof base64arr)
           console.log("base64arr", base64arr.length)
           if(Array.isArray(base64arr)){
