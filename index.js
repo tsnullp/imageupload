@@ -83,7 +83,7 @@ app.post('/upload-multi', async(req, res) => {
           console.log("base64strs", typeof req.bodybase64strs)
           console.log("base64strs", req.body.base64strs.length)
           const base64arr = JSON.parse(req.body.base64String)
-          console.log("base64arr", typeof req.base64arr)
+          console.log("base64arr", typeof base64arr)
           console.log("base64arr", base64arr.length)
           for(const item of base64arr) {
             console.log("item", item)
@@ -117,6 +117,7 @@ app.post('/upload-multi', async(req, res) => {
           });
       }
   } catch (err) {
+      console.log("err00", err)
       res.status(500).send(err);
   }
 })
