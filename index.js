@@ -17,7 +17,10 @@ app.use(fileUpload({
 // 미들 웨어 추가
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({
+  limit: '10mb',
+  extended:true
+}));
 app.use(morgan('dev'));
 
 // 포트 설정
