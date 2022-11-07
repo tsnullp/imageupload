@@ -82,7 +82,10 @@ app.post('/upload-multi', async(req, res) => {
           let i = 0
           console.log("base64strs", typeof req.bodybase64strs)
           console.log("base64strs", req.body.base64strs.length)
-          for(const item of req.body.base64strs) {
+          const base64arr = JSON.parse(req.body.base64String)
+          console.log("base64arr", typeof req.base64arr)
+          console.log("base64arr", base64arr.length)
+          for(const item of base64arr) {
             console.log("item", item)
             try {
               let randomStr = Math.random().toString(36).substring(2, 12);
