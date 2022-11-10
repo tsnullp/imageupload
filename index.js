@@ -8,7 +8,15 @@ const fs = require('fs')
 const app = express();
 const moment = require("moment")
 const path = require("path")
-const urlencode = require('urlencode')
+const fetch = require('node-fetch')
+const gify = require("node-video-to-gif")
+// let ffmpeg = require("ffmpeg")
+// let ffmpegPath = require("@ffmpeg-installer/ffmpeg").path
+// let ffprobePath = require("@ffprobe-installer/ffprobe").path
+// let fffmpeg = require("fluent-ffmpeg")
+// ffmpeg.setFfmpegPath(ffmpegPath)
+// ffmpeg.setFfprobePath(ffprobePath)
+
 // 파일 업로드 허용
 app.use(fileUpload({
     createParentPath: true
@@ -124,6 +132,43 @@ app.post('/upload-multi', async(req, res) => {
       }
   } catch (err) {
       console.log("err00", err)
+      res.status(500).send(err);
+  }
+})
+
+app.post('/upload-mp4', async (req, res) => {
+  try {
+      if (!req.body.mp4Url) {
+          res.send({
+              status: false,
+              message: '파일 업로드 실패'
+          });
+      } else {
+          const today = moment().format("YYYYMMDD")
+          !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
+          !fs.existsSync(path.join(UPLOAD, today)) && fs.mkdirSync(path.join(UPLOAD, today))
+          let randomStr = Math.random().toString(36).substring(2, 12);
+          let fileName = path.join(today, `${randomStr}.gif`)
+          while(fs.existsSync(path.join(UPLOAD, fileName))){
+            randomStr = Math.random().toString(36).substring(2, 12);
+            fileName = path.join(today, `${randomStr}.gif`)
+          }
+
+          const response = await fetch(req.body.mp4Url)
+          const buffer = await response.buffer();
+          fs.writeFileSync(path.join(UPLOAD, fileName), buffer)
+          
+          gify(path.join(UPLOAD, fileName), 'out.gif', function(err){
+            if (err) throw err;
+          });
+
+          res.send({
+              status: true,
+              message: '파일이 업로드 되었습니다.',
+              data: `http://tsnullp.chickenkiller.com:5100/${today}/${randomStr}.gif`
+          });
+      }
+  } catch (err) {
       res.status(500).send(err);
   }
 })

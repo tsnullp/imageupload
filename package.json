@@ -18,6 +18,8 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "morgan": "^1.10.0",
+    "node-fetch": "^2.6.7",
+    "node-video-to-gif": "^0.1.0",
     "urlencode": "^1.1.0"
   }
 }
