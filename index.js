@@ -490,7 +490,7 @@ const getAccessTokenWithRefreshToken1 = async () => {
     console.log("tokenList", tokenList)
     for (const item of tokenList) {
       try {
-        const auth = nodeBase64.encode(`${CLIENT_ID}:${SECRET_KEY}`)
+        const auth = nodeBase64.encode(`${CLIENT_ID1}:${SECRET_KEY1}`)
         let payload = `grant_type=refresh_token&refresh_token=${item.refresh_token}`
         let options = {
           method: "POST",
