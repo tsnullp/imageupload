@@ -641,7 +641,7 @@ const searchNaverItem = async () => {
         const promiseArray = items.map((item, index) => {
           return new Promise(async (resolve, reject) => {
             try {
-              console.log("mallName", `${i * index * 20 + index} / ${naverMalls.length}`, item.mallName)
+              // console.log("mallName", `${i * index * 20 + index} / ${naverMalls.length}`, item.mallName)
               const response = await getNaverRecommendShopping({
                 url: item.mallPcUrl,
                 category: "",
@@ -658,8 +658,8 @@ const searchNaverItem = async () => {
         
               if (Array.isArray(response) && response.length > 0) {
                 for (const naverItem of response) {
-                  console.log("naverItem", naverItem.name)
-                  console.log("naverItem.originArea", naverItem.originArea)
+                  // console.log("naverItem", naverItem.name)
+                  // console.log("naverItem.originArea", naverItem.originArea)
         
                   try {
                     if (naverItem.originArea === "일본") {
