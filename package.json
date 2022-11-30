@@ -11,17 +11,23 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.27.2",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
     "express-sanitizer": "^1.0.6",
+    "fake-useragent": "^1.0.1",
     "lodash": "^4.17.21",
     "mkcert": "^1.5.1",
     "moment": "^2.29.4",
+    "mongoose": "^6.7.4",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.7",
     "node-video-to-gif": "^0.1.0",
+    "nodejs-base64-converter": "^1.0.5",
+    "probe-image-size": "^7.2.3",
+    "request-promise-native": "^1.0.9",
     "urlencode": "^1.1.0"
   }
 }
