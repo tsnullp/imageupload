@@ -284,7 +284,7 @@ const startServer = async () => {
   })
   app.get("/cafe24/token/callbak1", async (req, res) => {
     const code = req.query.code
-    const response = await getAccessToken(code)
+    const response = await getAccessToken1(code)
     if (response) {
       // const { access_token, refresh_token } = res.json({ access_token, refresh_token, scopes })
       res.json(response)
@@ -487,7 +487,6 @@ const getAccessToken3 = async (code) => {
 const getAccessTokenWithRefreshToken1 = async () => {
   try {
     const tokenList = await AccessToken.find({ tokenType: 1 })
-    console.log("tokenList", tokenList)
     for (const item of tokenList) {
       try {
         const auth = nodeBase64.encode(`${CLIENT_ID1}:${SECRET_KEY1}`)
@@ -532,7 +531,6 @@ const getAccessTokenWithRefreshToken1 = async () => {
 const getAccessTokenWithRefreshToken2 = async () => {
   try {
     const tokenList = await AccessToken.find({ tokenType: 2 })
-    console.log("tokenList", tokenList)
     for (const item of tokenList) {
       try {
         const auth = nodeBase64.encode(`${CLIENT_ID2}:${SECRET_KEY2}`)
@@ -577,7 +575,6 @@ const getAccessTokenWithRefreshToken2 = async () => {
 const getAccessTokenWithRefreshToken3 = async () => {
   try {
     const tokenList = await AccessToken.find({ tokenType: 3 })
-    console.log("tokenList", tokenList)
     for (const item of tokenList) {
       try {
         const auth = nodeBase64.encode(`${CLIENT_ID3}:${SECRET_KEY3}`)
