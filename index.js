@@ -770,9 +770,9 @@ setTimeout(() => {
 }, 10000)
 
 setInterval(async function () {
-  console.log("getAccessTokenWithRefreshToken")
+  
   await getAccessTokenWithRefreshToken1()
   await getAccessTokenWithRefreshToken2()
   await getAccessTokenWithRefreshToken3()
 
-}, 60 * 60 * 1000)
+}, 20 * 60 * 1000)
