@@ -259,7 +259,7 @@ const startServer = async () => {
   app.get("/cafe24/token1", (req, res) => {
     mallid = req.query.mallid
     const scope =
-      "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping"
+      "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community"
     // const scope = "mall.read_order"
     const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID1}&redirect_uri=${REDIRECT_URL1}&scope=${scope}`
   
@@ -268,7 +268,7 @@ const startServer = async () => {
   app.get("/cafe24/token2", (req, res) => {
     mallid = req.query.mallid
     const scope =
-      "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping"
+      "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community"
     // const scope = "mall.read_order"
     const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID2}&redirect_uri=${REDIRECT_URL2}&scope=${scope}`
   
@@ -277,7 +277,7 @@ const startServer = async () => {
   app.get("/cafe24/token3", (req, res) => {
     mallid = req.query.mallid
     const scope =
-      "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping"
+      "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community"
     // const scope = "mall.read_order"
     const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID3}&redirect_uri=${REDIRECT_URL3}&scope=${scope}`
   
