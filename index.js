@@ -620,9 +620,6 @@ const getAccessTokenWithRefreshToken3 = async () => {
 
 
 
-
-
-
 const searchNaverItem = async () => {
   while(true) {
     try {
