@@ -1,6 +1,7 @@
 const translate = require("translate")
 const startBrowser = require("./startBrowser")
 const axios = require("axios")
+const { shuffle } = require("../lib/userFunc")
 
 const korTranslate = async text => {
 
@@ -224,7 +225,7 @@ const googleTranslate = async text => {
   }
 }
 
-const papagoTranslate = async text => {
+const papagoTranslate = async (text, source="zh-CN", target="ko") => {
   let clients = [
     {
       clientID: "HgpYPNhPhbJSuOqeOlQc",
