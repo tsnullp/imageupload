@@ -70,7 +70,12 @@ const startServer = async () => {
   }));
 
   // 미들 웨어 추가
-  app.use(cors());
+  app.use(cors({
+    origin: true,  
+    credentials: true, // 크로스 도메인 허용
+    methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
+  }));
+
   app.use(bodyParser.json());
   app.use(bodyParser.json({limit: "50000mb"}))
   app.use(bodyParser.urlencoded({
