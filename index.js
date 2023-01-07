@@ -288,6 +288,7 @@ const startServer = async () => {
   
     res.redirect(url)
   })
+  
   app.get("/cafe24/token/callbak1", async (req, res) => {
     
     try {
