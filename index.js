@@ -288,7 +288,7 @@ const startServer = async () => {
   
     res.redirect(url)
   })
-  app.get("/cafe24/token/callbak1", async (req, res) => {
+  app.get("/cafe24/token/callbak", async (req, res) => {
     res.json({ access_token: "", refresh_token: e, scopes: [] })
     
     
