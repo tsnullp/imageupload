@@ -289,18 +289,8 @@ const startServer = async () => {
     res.redirect(url)
   })
   app.get("/cafe24/token/callbak1", async (req, res) => {
-    try {
-      const code = req.query.code
-      const response = await getAccessToken1(code)
-      if (response) {
-        // const { access_token, refresh_token } = res.json({ access_token, refresh_token, scopes })
-        res.json(response)
-      } else {
-        res.json({ access_token: "", refresh_token: "", scopes: [] })
-      }
-    } catch(e) {
-      res.json({ access_token: "", refresh_token: e, scopes: [] })
-    }
+    res.json({ access_token: "", refresh_token: e, scopes: [] })
+    
     
   })
   app.get("/cafe24/token/callbak2", async (req, res) => {
