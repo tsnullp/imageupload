@@ -166,7 +166,7 @@ const startServer = async () => {
             const base64arr = req.body.base64strs.split("PAPAGO_OCR")
             if(Array.isArray(base64arr)){
               for(const item of base64arr) {
-                if(item.length > 10){
+                if(item && item.length > 10){
                   try {
                     let randomStr = Math.random().toString(36).substring(2, 12);
                     let fileName = path.join(TODAY, `${randomStr}.jpg`)
