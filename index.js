@@ -132,9 +132,9 @@ const startServer = async () => {
             if(base64String.includes("base64,")){
               base64String = base64String.split("base64,")[1]
             }
-            const bitmap = new Buffer(base64String, 'base64');  
+            const bitmap = new Buffer.from(base64String, 'base64');  
             fs.writeFileSync(FILE_DIR, bitmap)
-            bitmap = null
+            
             res.send({
                 status: true,
                 message: '파일이 업로드 되었습니다.',
@@ -181,10 +181,9 @@ const startServer = async () => {
                       base64String = base64String.split("base64,")[1]
                     }
           
-                    const bitmap = new Buffer(base64String, 'base64');  
+                    const bitmap = new Buffer.from(base64String, 'base64');  
                     fs.writeFileSync(FILE_DIR, bitmap)
                     data.push(`https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.jpg`)
-                    bitmap = null
                   } catch(e){
                     console.log("에러--->", e)
                   }
