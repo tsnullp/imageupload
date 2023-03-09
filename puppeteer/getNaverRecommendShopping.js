@@ -29,6 +29,7 @@ const find = async ({ url, category = "", regDay, minRecent, maxRecent, totalMin
     const temp21 = temp2.split("</script>")[0].trim()
     
     const jsObj = JSON.parse(temp21)
+    
     const {channel} = jsObj.smartStoreV2
 
     let simpleProducts = []
@@ -185,22 +186,23 @@ const find = async ({ url, category = "", regDay, minRecent, maxRecent, totalMin
       // item.category.wholeCategoryId.includes("50000009")
 
       // ){
-      //   return false
+        return false
+      // }
+      // console.log("item--", item)
+      // if (category.length === 0 || category.includes(item.category.wholeCategoryId.split(">")[0])) {
+      //   if (
+      //     item.saleAmount.recentSaleCount >= minRecent &&
+      //     item.saleAmount.cumulationSaleCount >= totalMinSale &&
+      //     item.reviewAmount.totalReviewCount >= minReview
+      //   ) {
+      //     return true
+      //   }
       // }
 
-      if (category.length === 0 || category.includes(item.category.wholeCategoryId.split(">")[0])) {
-        if (
-          item.saleAmount.recentSaleCount >= minRecent &&
-          item.saleAmount.cumulationSaleCount >= totalMinSale &&
-          item.reviewAmount.totalReviewCount >= minReview
-        ) {
-          return true
-        }
-      }
-
-      return false
+      // return false
     })) {
       try {
+        
         const content = await axios.get(
           `https://smartstore.naver.com/i/v1/stores/${item.channel.channelNo}/products/${item.id}`,
           {

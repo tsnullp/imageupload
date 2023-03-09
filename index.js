@@ -653,6 +653,7 @@ const searchNaverItem = async () => {
           $match: {
             // seachLabel: 1,
             // productCount: { $gt: 0 },
+            businessName: {$ne: "휴먼회원"}
           },
         }
       ])
@@ -681,7 +682,7 @@ const searchNaverItem = async () => {
           
                 if (Array.isArray(response) && response.length > 0) {
                   for (const naverItem of response) {
-                    // console.log("naverItem", naverItem.name)
+                    console.log("naverItem", naverItem)
                     // console.log("naverItem.originArea", naverItem.originArea)
           
                     try {
@@ -796,7 +797,7 @@ setTimeout(() => {
     getAccessTokenWithRefreshToken3()
   } catch(e) {}
   try {
-    searchNaverItem()
+    // searchNaverItem()
   } catch(e) {}
 }, 10000)
 
