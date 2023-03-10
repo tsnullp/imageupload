@@ -653,7 +653,9 @@ const searchNaverItem = async () => {
           $match: {
             // seachLabel: 1,
             // productCount: { $gt: 0 },
-            businessName: {$ne: "휴먼회원"}
+            businessName: {$ne: "휴먼회원"},
+            channelID: {$ne: null},
+            
           },
         }
       ])
@@ -667,6 +669,8 @@ const searchNaverItem = async () => {
               try {
                 // console.log("mallName", `${i * index * 20 + index} / ${naverMalls.length}`, item.mallName)
                 const response = await getNaverRecommendShopping({
+                  _id: item._id,
+                  channelID: item.channelID,
                   url: item.mallPcUrl,
                   category: "",
                   regDay: 300,
@@ -680,93 +684,93 @@ const searchNaverItem = async () => {
                   maxPrice: 2000000,
                 })
           
-                if (Array.isArray(response) && response.length > 0) {
-                  for (const naverItem of response) {
-                    console.log("naverItem", naverItem)
-                    // console.log("naverItem.originArea", naverItem.originArea)
+                // if (Array.isArray(response) && response.length > 0) {
+                //   for (const naverItem of response) {
+                //     console.log("naverItem", naverItem)
+                //     // console.log("naverItem.originArea", naverItem.originArea)
           
-                    try {
-                      if (naverItem.originArea === "일본") {
-                        await NaverJapanItem.findOneAndUpdate(
-                          {
-                            // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
-                            productNo: naverItem.productNo,
-                          },
-                          {
-                            $set: {
-                              // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
-                              productNo: naverItem.productNo,
-                              displayName: naverItem.displayName,
-                              detailUrl: naverItem.detailUrl,
-                              name: naverItem.name,
-                              title: naverItem.name.replace(/ /gi, ""),
-                              categoryId: naverItem.categoryId,
-                              category1: naverItem.category1,
-                              category2: naverItem.category2,
-                              category3: naverItem.category3,
-                              category4: naverItem.category4,
-                              salePrice: Number(naverItem.salePrice) ? Number(naverItem.salePrice) : 0,
-                              regDate: naverItem.regDate,
-                              image: naverItem.image,
-                              sellerTags: naverItem.sellerTags,
-                              reviewCount: naverItem.reviewCount,
-                              zzim: naverItem.zzim,
-                              purchaseCnt: naverItem.purchaseCnt,
-                              recentSaleCount: naverItem.recentSaleCount,
-                              zzim: naverItem.zzim,
-                              createdAt: moment().toDate(),
-                            },
-                          },
-                          {
-                            upsert: true,
-                            new: true,
-                          }
-                        )
-                      } else {
-                        await NaverFavoriteItem.findOneAndUpdate(
-                          {
-                            // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
-                            productNo: naverItem.productNo,
-                          },
-                          {
-                            $set: {
-                              // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
-                              productNo: naverItem.productNo,
-                              displayName: naverItem.displayName,
-                              detailUrl: naverItem.detailUrl,
-                              name: naverItem.name,
-                              title: naverItem.name.replace(/ /gi, ""),
-                              categoryId: naverItem.categoryId,
-                              category1: naverItem.category1,
-                              category2: naverItem.category2,
-                              category3: naverItem.category3,
-                              category4: naverItem.category4,
-                              salePrice: Number(naverItem.salePrice) ? Number(naverItem.salePrice) : 0,
-                              regDate: naverItem.regDate,
-                              image: naverItem.image,
-                              sellerTags: naverItem.sellerTags,
-                              reviewCount: naverItem.reviewCount,
-                              zzim: naverItem.zzim,
-                              purchaseCnt: naverItem.purchaseCnt,
-                              recentSaleCount: naverItem.recentSaleCount,
-                              zzim: naverItem.zzim,
-                              createdAt: moment().toDate(),
-                              originArea: naverItem.originArea
-                            },
-                          },
-                          {
-                            upsert: true,
-                            new: true,
-                          }
-                        )
-                      }
+                //     try {
+                //       if (naverItem.originArea === "일본") {
+                //         await NaverJapanItem.findOneAndUpdate(
+                //           {
+                //             // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
+                //             productNo: naverItem.productNo,
+                //           },
+                //           {
+                //             $set: {
+                //               // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
+                //               productNo: naverItem.productNo,
+                //               displayName: naverItem.displayName,
+                //               detailUrl: naverItem.detailUrl,
+                //               name: naverItem.name,
+                //               title: naverItem.name.replace(/ /gi, ""),
+                //               categoryId: naverItem.categoryId,
+                //               category1: naverItem.category1,
+                //               category2: naverItem.category2,
+                //               category3: naverItem.category3,
+                //               category4: naverItem.category4,
+                //               salePrice: Number(naverItem.salePrice) ? Number(naverItem.salePrice) : 0,
+                //               regDate: naverItem.regDate,
+                //               image: naverItem.image,
+                //               sellerTags: naverItem.sellerTags,
+                //               reviewCount: naverItem.reviewCount,
+                //               zzim: naverItem.zzim,
+                //               purchaseCnt: naverItem.purchaseCnt,
+                //               recentSaleCount: naverItem.recentSaleCount,
+                //               zzim: naverItem.zzim,
+                //               createdAt: moment().toDate(),
+                //             },
+                //           },
+                //           {
+                //             upsert: true,
+                //             new: true,
+                //           }
+                //         )
+                //       } else {
+                //         await NaverFavoriteItem.findOneAndUpdate(
+                //           {
+                //             // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
+                //             productNo: naverItem.productNo,
+                //           },
+                //           {
+                //             $set: {
+                //               // userID: ObjectId("5f0d5ff36fc75ec20d54c40b"),
+                //               productNo: naverItem.productNo,
+                //               displayName: naverItem.displayName,
+                //               detailUrl: naverItem.detailUrl,
+                //               name: naverItem.name,
+                //               title: naverItem.name.replace(/ /gi, ""),
+                //               categoryId: naverItem.categoryId,
+                //               category1: naverItem.category1,
+                //               category2: naverItem.category2,
+                //               category3: naverItem.category3,
+                //               category4: naverItem.category4,
+                //               salePrice: Number(naverItem.salePrice) ? Number(naverItem.salePrice) : 0,
+                //               regDate: naverItem.regDate,
+                //               image: naverItem.image,
+                //               sellerTags: naverItem.sellerTags,
+                //               reviewCount: naverItem.reviewCount,
+                //               zzim: naverItem.zzim,
+                //               purchaseCnt: naverItem.purchaseCnt,
+                //               recentSaleCount: naverItem.recentSaleCount,
+                //               zzim: naverItem.zzim,
+                //               createdAt: moment().toDate(),
+                //               originArea: naverItem.originArea
+                //             },
+                //           },
+                //           {
+                //             upsert: true,
+                //             new: true,
+                //           }
+                //         )
+                //       }
                       
-                    } catch (e) {
-                      console.log("error", e)
-                    }
-                  }
-                  // naverItemList.push(...response)
-                }
+                //     } catch (e) {
+                //       console.log("error", e)
+                //     }
+                //   }
+                //   // naverItemList.push(...response)
+                // }
     
                 resolve()
               } catch (e) {
@@ -797,7 +801,7 @@ setTimeout(() => {
     getAccessTokenWithRefreshToken3()
   } catch(e) {}
   try {
-    // searchNaverItem()
+    searchNaverItem()
   } catch(e) {}
 }, 10000)
 
