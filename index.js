@@ -278,13 +278,14 @@ const startServer = async () => {
               oem: 1,
               psm: 3
             })
-            console.log("text", text)
+           
             res.send({
               status: true,
-              message: image,
+              message: text,
             });
           } catch (e) {
             console.log("---->", e)
+            res.status(500).send(e);
           }
 
         }
