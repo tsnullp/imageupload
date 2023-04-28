@@ -846,9 +846,9 @@ setTimeout(() => {
   try {
     getAccessTokenWithRefreshToken3();
   } catch (e) {}
-  // try {
-  //   searchNaverItem()
-  // } catch(e) {}
+  try {
+    searchNaverItem();
+  } catch (e) {}
 }, 10000);
 
 setInterval(async function () {
