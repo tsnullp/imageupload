@@ -1,31 +1,31 @@
-const express = require('express');
-const https = require('https')
-const http = require('http')
-const bodyParser = require('body-parser');
-const fileUpload = require('express-fileupload');
-const cors = require('cors');
-const morgan = require('morgan')
-const _ = require('lodash')
-const fs = require('fs')
+const express = require("express");
+const https = require("https");
+const http = require("http");
+const bodyParser = require("body-parser");
+const fileUpload = require("express-fileupload");
+const cors = require("cors");
+const morgan = require("morgan");
+const _ = require("lodash");
+const fs = require("fs");
 const app = express();
-const moment = require("moment")
-const path = require("path")
-const fetch = require('node-fetch')
-const gify = require("node-video-to-gif")
-const database = require("./database")
-const AccessToken = require("./models/AccessToken")
-const Cookie = require("./models/Cookie")
-const NaverMall = require("./models/naverMall")
-const NaverFavoriteItem = require("./models/NaverFavoriteItem")
-const NaverJapanItem = require("./models/NaverJapanItem")
-const GetSeasonKeyword = require("./puppeteer/getSeasonKeyword")
-const User = require("./models/User")
-const Basic = require("./models/Basic")
-const Market = require("./models/Market")
-const mongoose = require("mongoose")
-const ObjectId = mongoose.Types.ObjectId
-const nodeBase64 = require("nodejs-base64-converter")
-const request = require("request-promise-native")
+const moment = require("moment");
+const path = require("path");
+const fetch = require("node-fetch");
+const gify = require("node-video-to-gif");
+const database = require("./database");
+const AccessToken = require("./models/AccessToken");
+const Cookie = require("./models/Cookie");
+const NaverMall = require("./models/naverMall");
+const NaverFavoriteItem = require("./models/NaverFavoriteItem");
+const NaverJapanItem = require("./models/NaverJapanItem");
+const GetSeasonKeyword = require("./puppeteer/getSeasonKeyword");
+const User = require("./models/User");
+const Basic = require("./models/Basic");
+const Market = require("./models/Market");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
+const nodeBase64 = require("nodejs-base64-converter");
+const request = require("request-promise-native");
 const {
   sleep,
   checkStr,
@@ -33,59 +33,64 @@ const {
   imageCheck,
   AmazonAsin,
   getAppDataPath,
-  DimensionArray
-} = require("./lib/userFunc")
-const getNaverRecommendShopping = require("./puppeteer/getNaverRecommendShopping")
-const axios = require("axios")
-const tesseract = require("node-tesseract-ocr")
+  DimensionArray,
+} = require("./lib/userFunc");
+const getNaverRecommendShopping = require("./puppeteer/getNaverRecommendShopping");
+const axios = require("axios");
+const tesseract = require("node-tesseract-ocr");
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
-
-const CLIENT_ID1 = "lv8Si6qgAV6iLJqrCCYp4B"
-const CLIENT_ID2 = "7bFAHrRCBlplAcsGJEZmmD"
-const CLIENT_ID3 = "seY7sh5SWCqDtzGmLZboyH"
-const SECRET_KEY1 = "M8UFmAzlK50jVYCMXqrTjD"
-const SECRET_KEY2 = "pOMhnUDuGFxgEekaw10IgE"
-const SECRET_KEY3 = "NOq7vE2iIx2ouflwWEV2ID"
-const REDIRECT_URL1 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak1"
-const REDIRECT_URL2 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak2"
-const REDIRECT_URL3 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak3"
-let mallid
+const CLIENT_ID1 = "lv8Si6qgAV6iLJqrCCYp4B";
+const CLIENT_ID2 = "7bFAHrRCBlplAcsGJEZmmD";
+const CLIENT_ID3 = "seY7sh5SWCqDtzGmLZboyH";
+const SECRET_KEY1 = "M8UFmAzlK50jVYCMXqrTjD";
+const SECRET_KEY2 = "pOMhnUDuGFxgEekaw10IgE";
+const SECRET_KEY3 = "NOq7vE2iIx2ouflwWEV2ID";
+const REDIRECT_URL1 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak1";
+const REDIRECT_URL2 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak2";
+const REDIRECT_URL3 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak3";
+let mallid;
 
 const startServer = async () => {
   // const options = await createCA()
   // console.log("options", options)
-  let options = {}
+  let options = {};
   try {
     options = {
-      key: fs.readFileSync(__dirname + '\\ssl\\private.key', 'utf-8'),
-      cert: fs.readFileSync(__dirname + '\\ssl\\certificate.crt', 'utf-8'),
+      key: fs.readFileSync(__dirname + "\\ssl\\private.key", "utf-8"),
+      cert: fs.readFileSync(__dirname + "\\ssl\\certificate.crt", "utf-8"),
       requestCert: false,
-      rejectUnauthorized: false
-    }
-  } catch (e) { }
+      rejectUnauthorized: false,
+    };
+  } catch (e) {}
 
   // 파일 업로드 허용
-  app.use(fileUpload({
-    createParentPath: true
-  }));
+  app.use(
+    fileUpload({
+      createParentPath: true,
+    })
+  );
 
   // 미들 웨어 추가
-  app.use(cors({
-    origin: true,
-    credentials: true, // 크로스 도메인 허용
-    methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
-  }));
+  app.use(
+    cors({
+      origin: true,
+      credentials: true, // 크로스 도메인 허용
+      methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+    })
+  );
 
   app.use(bodyParser.json());
-  app.use(bodyParser.json({ limit: "50000mb" }))
-  app.use(bodyParser.urlencoded({
-    limit: "50000mb",
-    extended: true
-  }));
+  app.use(bodyParser.json({ limit: "50000mb" }));
+  app.use(
+    bodyParser.urlencoded({
+      limit: "50000mb",
+      extended: true,
+    })
+  );
 
-  app.use(morgan('dev'));
+  app.use(morgan("dev"));
 
   // 포트 설정
   const httpsPort = 5100;
@@ -93,8 +98,8 @@ const startServer = async () => {
 
   // const httpsPort = 5200;
   // const httpPort = 5201;
-  const DIR = path.join("D:", "imageupload")
-  const UPLOAD = "upload"
+  const DIR = path.join("D:", "imageupload");
+  const UPLOAD = "upload";
 
   app.use(express.static(path.join(DIR, UPLOAD)));
 
@@ -104,286 +109,285 @@ const startServer = async () => {
 
   http.createServer(app).listen(httpPort, () => {
     console.log(`HTTP server listening on port ${httpPort}.`);
-  })
+  });
 
-
-  app.post('/upload', async (req, res) => {
+  app.post("/upload", async (req, res) => {
     try {
       if (!req.body.base64str) {
         res.send({
           status: false,
-          message: '파일 업로드 실패'
+          message: "파일 업로드 실패",
         });
       } else {
-        const TODAY = moment().format("YYYYMMDD")
-        const UPLOAD_FOLDER = path.join(DIR, UPLOAD)
-        const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY)
+        const TODAY = moment().format("YYYYMMDD");
+        const UPLOAD_FOLDER = path.join(DIR, UPLOAD);
+        const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY);
 
-        !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
-        !fs.existsSync(UPLOAD_FOLDER) && fs.mkdirSync(UPLOAD_FOLDER)
-        !fs.existsSync(UPLOAD_FOLDER_TODAY) && fs.mkdirSync(UPLOAD_FOLDER_TODAY)
+        !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD);
+        !fs.existsSync(UPLOAD_FOLDER) && fs.mkdirSync(UPLOAD_FOLDER);
+        !fs.existsSync(UPLOAD_FOLDER_TODAY) &&
+          fs.mkdirSync(UPLOAD_FOLDER_TODAY);
 
         let randomStr = Math.random().toString(36).substring(2, 12);
-        let fileName = path.join(TODAY, `${randomStr}.jpg`)
+        let fileName = path.join(TODAY, `${randomStr}.jpg`);
         while (fs.existsSync(path.join(UPLOAD_FOLDER, fileName))) {
           randomStr = Math.random().toString(36).substring(2, 12);
-          fileName = path.join(TODAY, `${randomStr}.jpg`)
+          fileName = path.join(TODAY, `${randomStr}.jpg`);
         }
-        const FILE_DIR = path.join(UPLOAD_FOLDER, fileName)
-        let base64String = req.body.base64str
+        const FILE_DIR = path.join(UPLOAD_FOLDER, fileName);
+        let base64String = req.body.base64str;
         if (base64String.includes("base64,")) {
-          base64String = base64String.split("base64,")[1]
+          base64String = base64String.split("base64,")[1];
         }
-        const bitmap = new Buffer.from(base64String, 'base64');
-        fs.writeFileSync(FILE_DIR, bitmap)
+        const bitmap = new Buffer.from(base64String, "base64");
+        fs.writeFileSync(FILE_DIR, bitmap);
 
         res.send({
           status: true,
-          message: '파일이 업로드 되었습니다.',
-          data: `https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.jpg`
+          message: "파일이 업로드 되었습니다.",
+          data: `https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.jpg`,
         });
       }
     } catch (err) {
       res.status(500).send(err);
     }
-  })
+  });
 
-  app.post('/upload-multi', async (req, res) => {
+  app.post("/upload-multi", async (req, res) => {
     try {
       if (!req.body.base64strs) {
         res.send({
           status: false,
-          message: "파일 업로드 실패"
-        })
+          message: "파일 업로드 실패",
+        });
       } else {
         let data = [];
-        const TODAY = moment().format("YYYYMMDD")
-        const UPLOAD_FOLDER = path.join(DIR, UPLOAD)
-        const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY)
+        const TODAY = moment().format("YYYYMMDD");
+        const UPLOAD_FOLDER = path.join(DIR, UPLOAD);
+        const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY);
 
-        !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
-        !fs.existsSync(UPLOAD_FOLDER) && fs.mkdirSync(UPLOAD_FOLDER)
-        !fs.existsSync(UPLOAD_FOLDER_TODAY) && fs.mkdirSync(UPLOAD_FOLDER_TODAY)
+        !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD);
+        !fs.existsSync(UPLOAD_FOLDER) && fs.mkdirSync(UPLOAD_FOLDER);
+        !fs.existsSync(UPLOAD_FOLDER_TODAY) &&
+          fs.mkdirSync(UPLOAD_FOLDER_TODAY);
 
-        const base64arr = req.body.base64strs.split("PAPAGO_OCR")
+        const base64arr = req.body.base64strs.split("PAPAGO_OCR");
         if (Array.isArray(base64arr)) {
           for (const item of base64arr) {
             if (item && item.length > 10) {
               try {
                 let randomStr = Math.random().toString(36).substring(2, 12);
-                let fileName = path.join(TODAY, `${randomStr}.jpg`)
+                let fileName = path.join(TODAY, `${randomStr}.jpg`);
                 while (fs.existsSync(path.join(UPLOAD, fileName))) {
-
                   randomStr = Math.random().toString(36).substring(2, 12);
-                  fileName = path.join(TODAY, `${randomStr}.jpg`)
+                  fileName = path.join(TODAY, `${randomStr}.jpg`);
                 }
-                const FILE_DIR = path.join(UPLOAD_FOLDER, fileName)
-                let base64String = item
+                const FILE_DIR = path.join(UPLOAD_FOLDER, fileName);
+                let base64String = item;
                 if (base64String.includes("base64,")) {
-                  base64String = base64String.split("base64,")[1]
+                  base64String = base64String.split("base64,")[1];
                 }
 
-                const bitmap = new Buffer.from(base64String, 'base64');
-                fs.writeFileSync(FILE_DIR, bitmap)
-                data.push(`https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.jpg`)
+                const bitmap = new Buffer.from(base64String, "base64");
+                fs.writeFileSync(FILE_DIR, bitmap);
+                data.push(
+                  `https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.jpg`
+                );
               } catch (e) {
-                console.log("에러--->", e)
+                console.log("에러--->", e);
               }
             }
-
           }
 
           // return response
           res.send({
             status: true,
-            message: '파일들이 업로드 되었습니다.',
-            data: data
+            message: "파일들이 업로드 되었습니다.",
+            data: data,
           });
         } else {
           res.send({
             status: false,
-            message: "파일 업로드 실패"
-          })
+            message: "파일 업로드 실패",
+          });
         }
-
       }
     } catch (err) {
-      console.log("err00", err)
+      console.log("err00", err);
       res.status(500).send(err);
     }
-  })
+  });
 
-  app.post('/upload-mp4', async (req, res) => {
+  app.post("/upload-mp4", async (req, res) => {
     try {
       if (!req.body.mp4Url) {
         res.send({
           status: false,
-          message: '파일 업로드 실패'
+          message: "파일 업로드 실패",
         });
       } else {
-        const TODAY = moment().format("YYYYMMDD")
-        const UPLOAD_FOLDER = path.join(DIR, UPLOAD)
-        const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY)
+        const TODAY = moment().format("YYYYMMDD");
+        const UPLOAD_FOLDER = path.join(DIR, UPLOAD);
+        const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY);
 
-        !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD)
-        !fs.existsSync(UPLOAD_FOLDER) && fs.mkdirSync(UPLOAD_FOLDER)
-        !fs.existsSync(UPLOAD_FOLDER_TODAY) && fs.mkdirSync(UPLOAD_FOLDER_TODAY)
+        !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD);
+        !fs.existsSync(UPLOAD_FOLDER) && fs.mkdirSync(UPLOAD_FOLDER);
+        !fs.existsSync(UPLOAD_FOLDER_TODAY) &&
+          fs.mkdirSync(UPLOAD_FOLDER_TODAY);
 
         let randomStr = Math.random().toString(36).substring(2, 12);
-        let fileName = path.join(TODAY, `${randomStr}.mp4`)
+        let fileName = path.join(TODAY, `${randomStr}.mp4`);
         while (fs.existsSync(path.join(UPLOAD_FOLDER, fileName))) {
           randomStr = Math.random().toString(36).substring(2, 12);
-          fileName = path.join(TODAY, `${randomStr}.mp4`)
+          fileName = path.join(TODAY, `${randomStr}.mp4`);
         }
-        const FILE_DIR = path.join(UPLOAD_FOLDER, fileName)
-        const response = await fetch(req.body.mp4Url)
+        const FILE_DIR = path.join(UPLOAD_FOLDER, fileName);
+        const response = await fetch(req.body.mp4Url);
 
         const buffer = await response.buffer();
 
-        fs.writeFileSync(FILE_DIR, buffer)
+        fs.writeFileSync(FILE_DIR, buffer);
 
-        gifyPromise(FILE_DIR, path.join(UPLOAD_FOLDER_TODAY, `${randomStr}.gif`))
-
+        gifyPromise(
+          FILE_DIR,
+          path.join(UPLOAD_FOLDER_TODAY, `${randomStr}.gif`)
+        );
 
         res.send({
           status: true,
-          message: '파일이 업로드 되었습니다.',
-          data: `https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.gif`
+          message: "파일이 업로드 되었습니다.",
+          data: `https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.gif`,
         });
       }
     } catch (err) {
-      console.log("err--->", err)
+      console.log("err--->", err);
       res.status(500).send(err);
     }
-  })
+  });
 
-  app.post('/imageOcr', async (req, res) => {
+  app.post("/imageOcr", async (req, res) => {
     try {
       if (!req.body.image) {
         res.send({
           status: false,
-          message: '이미지 없음'
+          message: "이미지 없음",
         });
       } else {
-        const image = req.body.image
+        const image = req.body.image;
         if (!image.includes("http")) {
           res.send({
             status: false,
-            message: '이미지 없음'
+            message: "이미지 없음",
           });
         } else {
           try {
             const text = await tesseract.recognize(image, {
               lang: "chi_tra",
               oem: 1,
-              psm: 3
-            })
-           
+              psm: 3,
+            });
+
             res.send({
               status: true,
               message: text,
             });
           } catch (e) {
-            console.log("---->", e)
+            console.log("---->", e);
             res.status(500).send(e);
           }
-
         }
       }
     } catch (err) {
-      console.log("imageOcr err--->", err)
+      console.log("imageOcr err--->", err);
       res.status(500).send(err);
     }
-  })
+  });
 
   //https 의존성으로 certificate와 private key로 새로운 서버를 시작
   https.createServer(options, app).listen(httpsPort, () => {
     console.log(`HTTPS server started on port ${httpsPort}`);
   });
 
-
   app.get("/cafe24/token1", (req, res) => {
     try {
-      mallid = req.query.mallid
+      mallid = req.query.mallid;
       const scope =
-        "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community"
+        "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community";
       // const scope = "mall.read_order"
-      const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID1}&redirect_uri=${REDIRECT_URL1}&scope=${scope}`
+      const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID1}&redirect_uri=${REDIRECT_URL1}&scope=${scope}`;
 
-      res.redirect(url)
+      res.redirect(url);
     } catch (e) {
-      res.json({ error: e })
+      res.json({ error: e });
     }
-  })
+  });
   app.get("/cafe24/token2", (req, res) => {
     try {
-      mallid = req.query.mallid
+      mallid = req.query.mallid;
       const scope =
-        "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community"
+        "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community";
       // const scope = "mall.read_order"
-      const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID2}&redirect_uri=${REDIRECT_URL2}&scope=${scope}`
+      const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID2}&redirect_uri=${REDIRECT_URL2}&scope=${scope}`;
 
-      res.redirect(url)
+      res.redirect(url);
     } catch (e) {
-      res.json({ error: e })
+      res.json({ error: e });
     }
-  })
+  });
   app.get("/cafe24/token3", (req, res) => {
     try {
-      mallid = req.query.mallid
+      mallid = req.query.mallid;
       const scope =
-        "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community"
+        "mall.read_category,mall.write_category,mall.write_collection,mall.read_order,mall.write_order,mall.read_product,mall.write_product,mall.read_salesreport,mall.read_shipping,mall.write_shipping,mall.read_community";
       // const scope = "mall.read_order"
-      const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID3}&redirect_uri=${REDIRECT_URL3}&scope=${scope}`
+      const url = `https://${mallid}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID3}&redirect_uri=${REDIRECT_URL3}&scope=${scope}`;
 
-      res.redirect(url)
+      res.redirect(url);
     } catch (e) {
-      res.json({ error: e })
+      res.json({ error: e });
     }
-  })
+  });
 
   app.get("/cafe24/token/callbak1", async (req, res) => {
-
     try {
-      const code = req.query.code
-      const response = await getAccessToken1(code)
+      const code = req.query.code;
+      const response = await getAccessToken1(code);
       if (response) {
         // const { access_token, refresh_token } = res.json({ access_token, refresh_token, scopes })
-        res.json(response)
+        res.json(response);
       } else {
-        res.json({ access_token: "", refresh_token: "", scopes: [] })
+        res.json({ access_token: "", refresh_token: "", scopes: [] });
       }
     } catch (e) {
-      res.json({ access_token: "", refresh_token: e, scopes: [] })
+      res.json({ access_token: "", refresh_token: e, scopes: [] });
     }
-
-  })
+  });
   app.get("/cafe24/token/callbak2", async (req, res) => {
-    const code = req.query.code
-    const response = await getAccessToken2(code)
+    const code = req.query.code;
+    const response = await getAccessToken2(code);
 
     if (response) {
       // const { access_token, refresh_token } = res.json({ access_token, refresh_token, scopes })
-      res.json(response)
+      res.json(response);
     } else {
-      res.json({ access_token: "", refresh_token: "", scopes: [] })
+      res.json({ access_token: "", refresh_token: "", scopes: [] });
     }
-  })
+  });
   app.get("/cafe24/token/callbak3", async (req, res) => {
-    const code = req.query.code
-    const response = await getAccessToken3(code)
+    const code = req.query.code;
+    const response = await getAccessToken3(code);
 
     if (response) {
       // const { access_token, refresh_token } = res.json({ access_token, refresh_token, scopes })
-      res.json(response)
+      res.json(response);
     } else {
-      res.json({ access_token: "", refresh_token: "", scopes: [] })
+      res.json({ access_token: "", refresh_token: "", scopes: [] });
     }
-  })
+  });
 
   app.post("/taobao/cookie", async (req, res) => {
     try {
-      const { nick, cookie } = req.body
+      const { nick, cookie } = req.body;
       await Cookie.findOneAndUpdate(
         {
           name: nick,
@@ -398,43 +402,47 @@ const startServer = async () => {
         {
           upsert: true,
         }
-      )
+      );
     } catch (e) {
-      console.log("/taobao/cookie", e)
+      console.log("/taobao/cookie", e);
     } finally {
-      res.json({ succuess: "ok" })
+      res.json({ succuess: "ok" });
     }
-  })
+  });
+};
 
-}
-
-startServer()
-database()
+startServer();
+database();
 
 const gifyPromise = (a, b) => {
   return new Promise((resolve, reject) => {
-    gify(a, b, {
-      // width: 100,
-      // rate: 4,
-      // start: 4,
-      // duration: 6
-    }, function (err) {
-      //  fs.unlink(path.join(UPLOAD, fileName))
-      fs.unlinkSync(a)
-      if (err) {
-        console.log("err0", err)
-        reject(err)
-      } else {
-        resolve(b)
+    gify(
+      a,
+      b,
+      {
+        // width: 100,
+        // rate: 4,
+        // start: 4,
+        // duration: 6
+      },
+      function (err) {
+        //  fs.unlink(path.join(UPLOAD, fileName))
+        fs.unlinkSync(a);
+        if (err) {
+          console.log("err0", err);
+          reject(err);
+        } else {
+          resolve(b);
+        }
       }
-    });
-  })
-}
+    );
+  });
+};
 
 const getAccessToken1 = async (code) => {
   try {
-    const auth = nodeBase64.encode(`${CLIENT_ID1}:${SECRET_KEY1}`)
-    let payload = `grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URL1}`
+    const auth = nodeBase64.encode(`${CLIENT_ID1}:${SECRET_KEY1}`);
+    let payload = `grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URL1}`;
     let options = {
       method: "POST",
       url: `https://${mallid}.cafe24api.com/api/v2/oauth/token`,
@@ -444,9 +452,9 @@ const getAccessToken1 = async (code) => {
       },
       body: payload,
       json: true,
-    }
+    };
 
-    let response = await request(options)
+    let response = await request(options);
 
     await AccessToken.findOneAndUpdate(
       { mall_id: mallid },
@@ -463,18 +471,18 @@ const getAccessToken1 = async (code) => {
         },
       },
       { upsert: true }
-    )
-    return response
+    );
+    return response;
   } catch (e) {
-    console.log("getAccessToken", e)
-    return null
+    console.log("getAccessToken", e);
+    return null;
   }
-}
+};
 
 const getAccessToken2 = async (code) => {
   try {
-    const auth = nodeBase64.encode(`${CLIENT_ID2}:${SECRET_KEY2}`)
-    let payload = `grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URL2}`
+    const auth = nodeBase64.encode(`${CLIENT_ID2}:${SECRET_KEY2}`);
+    let payload = `grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URL2}`;
     let options = {
       method: "POST",
       url: `https://${mallid}.cafe24api.com/api/v2/oauth/token`,
@@ -484,9 +492,9 @@ const getAccessToken2 = async (code) => {
       },
       body: payload,
       json: true,
-    }
+    };
 
-    let response = await request(options)
+    let response = await request(options);
 
     await AccessToken.findOneAndUpdate(
       { mall_id: mallid },
@@ -503,17 +511,17 @@ const getAccessToken2 = async (code) => {
         },
       },
       { upsert: true }
-    )
-    return response
+    );
+    return response;
   } catch (e) {
-    console.log("getAccessToken2", e)
-    return null
+    console.log("getAccessToken2", e);
+    return null;
   }
-}
+};
 const getAccessToken3 = async (code) => {
   try {
-    const auth = nodeBase64.encode(`${CLIENT_ID3}:${SECRET_KEY3}`)
-    let payload = `grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URL3}`
+    const auth = nodeBase64.encode(`${CLIENT_ID3}:${SECRET_KEY3}`);
+    let payload = `grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URL3}`;
     let options = {
       method: "POST",
       url: `https://${mallid}.cafe24api.com/api/v2/oauth/token`,
@@ -523,9 +531,9 @@ const getAccessToken3 = async (code) => {
       },
       body: payload,
       json: true,
-    }
+    };
 
-    let response = await request(options)
+    let response = await request(options);
 
     await AccessToken.findOneAndUpdate(
       { mall_id: mallid },
@@ -542,21 +550,21 @@ const getAccessToken3 = async (code) => {
         },
       },
       { upsert: true }
-    )
-    return response
+    );
+    return response;
   } catch (e) {
-    console.log("getAccessToken3", e)
-    return null
+    console.log("getAccessToken3", e);
+    return null;
   }
-}
+};
 
 const getAccessTokenWithRefreshToken1 = async () => {
   try {
-    const tokenList = await AccessToken.find({ tokenType: 1 })
+    const tokenList = await AccessToken.find({ tokenType: 1 });
     for (const item of tokenList) {
       try {
-        const auth = nodeBase64.encode(`${CLIENT_ID1}:${SECRET_KEY1}`)
-        let payload = `grant_type=refresh_token&refresh_token=${item.refresh_token}`
+        const auth = nodeBase64.encode(`${CLIENT_ID1}:${SECRET_KEY1}`);
+        let payload = `grant_type=refresh_token&refresh_token=${item.refresh_token}`;
         let options = {
           method: "POST",
           url: `https://${item.mall_id}.cafe24api.com/api/v2/oauth/token`,
@@ -566,9 +574,9 @@ const getAccessTokenWithRefreshToken1 = async () => {
           },
           body: payload,
           json: true,
-        }
+        };
 
-        let response = await request(options)
+        let response = await request(options);
 
         await AccessToken.findOneAndUpdate(
           { mall_id: item.mall_id },
@@ -585,22 +593,22 @@ const getAccessTokenWithRefreshToken1 = async () => {
             },
           },
           { upsert: true }
-        )
+        );
       } catch (e) {
-        console.log("getAccessTokenWithRefreshToken1", e)
+        console.log("getAccessTokenWithRefreshToken1", e);
       }
     }
   } catch (e) {
-    console.log("getAccessTokenWithRefreshToken", e)
+    console.log("getAccessTokenWithRefreshToken", e);
   }
-}
+};
 const getAccessTokenWithRefreshToken2 = async () => {
   try {
-    const tokenList = await AccessToken.find({ tokenType: 2 })
+    const tokenList = await AccessToken.find({ tokenType: 2 });
     for (const item of tokenList) {
       try {
-        const auth = nodeBase64.encode(`${CLIENT_ID2}:${SECRET_KEY2}`)
-        let payload = `grant_type=refresh_token&refresh_token=${item.refresh_token}`
+        const auth = nodeBase64.encode(`${CLIENT_ID2}:${SECRET_KEY2}`);
+        let payload = `grant_type=refresh_token&refresh_token=${item.refresh_token}`;
         let options = {
           method: "POST",
           url: `https://${item.mall_id}.cafe24api.com/api/v2/oauth/token`,
@@ -610,9 +618,9 @@ const getAccessTokenWithRefreshToken2 = async () => {
           },
           body: payload,
           json: true,
-        }
+        };
 
-        let response = await request(options)
+        let response = await request(options);
 
         await AccessToken.findOneAndUpdate(
           { mall_id: item.mall_id },
@@ -629,22 +637,22 @@ const getAccessTokenWithRefreshToken2 = async () => {
             },
           },
           { upsert: true }
-        )
+        );
       } catch (e) {
-        console.log("getAccessTokenWithRefreshToken2", e)
+        console.log("getAccessTokenWithRefreshToken2", e);
       }
     }
   } catch (e) {
-    console.log("getAccessTokenWithRefreshToken", e)
+    console.log("getAccessTokenWithRefreshToken", e);
   }
-}
+};
 const getAccessTokenWithRefreshToken3 = async () => {
   try {
-    const tokenList = await AccessToken.find({ tokenType: 3 })
+    const tokenList = await AccessToken.find({ tokenType: 3 });
     for (const item of tokenList) {
       try {
-        const auth = nodeBase64.encode(`${CLIENT_ID3}:${SECRET_KEY3}`)
-        let payload = `grant_type=refresh_token&refresh_token=${item.refresh_token}`
+        const auth = nodeBase64.encode(`${CLIENT_ID3}:${SECRET_KEY3}`);
+        let payload = `grant_type=refresh_token&refresh_token=${item.refresh_token}`;
         let options = {
           method: "POST",
           url: `https://${item.mall_id}.cafe24api.com/api/v2/oauth/token`,
@@ -654,9 +662,9 @@ const getAccessTokenWithRefreshToken3 = async () => {
           },
           body: payload,
           json: true,
-        }
+        };
 
-        let response = await request(options)
+        let response = await request(options);
 
         await AccessToken.findOneAndUpdate(
           { mall_id: item.mall_id },
@@ -673,17 +681,15 @@ const getAccessTokenWithRefreshToken3 = async () => {
             },
           },
           { upsert: true }
-        )
+        );
       } catch (e) {
-        console.log("getAccessTokenWithRefreshToken2", e)
+        console.log("getAccessTokenWithRefreshToken2", e);
       }
     }
   } catch (e) {
-    console.log("getAccessTokenWithRefreshToken", e)
+    console.log("getAccessTokenWithRefreshToken", e);
   }
-}
-
-
+};
 
 const searchNaverItem = async () => {
   while (true) {
@@ -695,14 +701,13 @@ const searchNaverItem = async () => {
             // productCount: { $gt: 0 },
             businessName: { $ne: "휴먼회원" },
             channelID: { $ne: null },
-
           },
-        }
-      ])
+        },
+      ]);
 
       for (const items of DimensionArray(naverMalls, 20)) {
         try {
-          await sleep(2000)
+          await sleep(2000);
 
           const promiseArray = items.map((item, index) => {
             return new Promise(async (resolve, reject) => {
@@ -722,7 +727,7 @@ const searchNaverItem = async () => {
                   maxReview: 1000,
                   minPrice: 0,
                   maxPrice: 2000000,
-                })
+                });
 
                 // if (Array.isArray(response) && response.length > 0) {
                 //   for (const naverItem of response) {
@@ -812,50 +817,48 @@ const searchNaverItem = async () => {
                 //   // naverItemList.push(...response)
                 // }
 
-                resolve()
+                resolve();
               } catch (e) {
-                console.log("Promise Error", e)
-                reject(e)
+                console.log("Promise Error", e);
+                reject(e);
               }
-            })
-          })
-          await Promise.all(promiseArray)
-        } catch (e) { }
+            });
+          });
+          await Promise.all(promiseArray);
+        } catch (e) {}
       }
-      console.log("***** 끝 *****")
+      console.log("***** 끝 *****");
     } catch (e) {
-      console.log("scheduleError", e)
+      console.log("scheduleError", e);
     }
   }
-
-}
+};
 
 // GetSeasonKeyword({ keyword: "조립식닭장" })
 
+setTimeout(() => {
+  try {
+    getAccessTokenWithRefreshToken1();
+  } catch (e) {}
+  try {
+    getAccessTokenWithRefreshToken2();
+  } catch (e) {}
+  try {
+    getAccessTokenWithRefreshToken3();
+  } catch (e) {}
+  // try {
+  //   searchNaverItem()
+  // } catch(e) {}
+}, 10000);
 
-// setTimeout(() => {
-//   try {
-//     getAccessTokenWithRefreshToken1()
-//   } catch(e) {}
-//   try {
-//     getAccessTokenWithRefreshToken2()
-//   } catch(e) {}
-//   try {
-//     getAccessTokenWithRefreshToken3()
-//   } catch(e) {}
-//   try {
-//     searchNaverItem()
-//   } catch(e) {}
-// }, 10000)
-
-// setInterval(async function () {
-//   try {
-//     getAccessTokenWithRefreshToken1()
-//   } catch(e) {}
-//   try {
-//     getAccessTokenWithRefreshToken2()
-//   } catch(e) {}
-//   try {
-//     getAccessTokenWithRefreshToken3()
-//   } catch(e) {}
-// }, 20 * 60 * 1000)
+setInterval(async function () {
+  try {
+    getAccessTokenWithRefreshToken1();
+  } catch (e) {}
+  try {
+    getAccessTokenWithRefreshToken2();
+  } catch (e) {}
+  try {
+    getAccessTokenWithRefreshToken3();
+  } catch (e) {}
+}, 20 * 60 * 1000);
