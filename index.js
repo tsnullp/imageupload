@@ -34,6 +34,7 @@ const {
   AmazonAsin,
   getAppDataPath,
   DimensionArray,
+  getToken,
 } = require("./lib/userFunc");
 const getNaverRecommendShopping = require("./puppeteer/getNaverRecommendShopping");
 const axios = require("axios");
@@ -408,6 +409,73 @@ const startServer = async () => {
     } finally {
       res.json({ succuess: "ok" });
     }
+  });
+
+  app.get("/naver/attribute", async (req, res) => {
+    const { categoryID } = req.query;
+    if (!categoryID) {
+      res.json([]);
+      return;
+    }
+    const token = await getToken();
+    if (!token) {
+      res.json([]);
+      return;
+    }
+    const attribute = await axios({
+      url: `https://api.commerce.naver.com/external/v1/product-attributes/attributes?categoryId=${categoryID}`,
+      method: "GET",
+      headers: {
+        Authorization: `${token.token_type} ${token.access_token}`,
+        "content-type": "application/json",
+      },
+    });
+
+    const attributeValue = await axios({
+      url: `https://api.commerce.naver.com/external/v1/product-attributes/attribute-values?categoryId=${categoryID}`,
+      method: "GET",
+      headers: {
+        Authorization: `${token.token_type} ${token.access_token}`,
+        "content-type": "application/json",
+      },
+    });
+    const unitValue = await axios({
+      url: `https://api.commerce.naver.com/external/v1/product-attributes/attribute-value-units`,
+      method: "GET",
+      headers: {
+        Authorization: `${token.token_type} ${token.access_token}`,
+        "content-type": "application/json",
+      },
+    });
+
+    for (const item of attribute.data) {
+      const findObj = _.filter(attributeValue.data, {
+        attributeSeq: item.attributeSeq,
+      });
+      if (findObj) {
+        for (const value of findObj) {
+          if (value.minAttributeValueUnitCode) {
+            const findValue = _.find(unitValue.data, {
+              id: value.minAttributeValueUnitCode,
+            });
+            if (findValue) {
+              value.minUnitCodeName = findValue.unitCodeName;
+            }
+          }
+          if (value.maxAttributeValueUnitCode) {
+            const findValue = _.find(unitValue.data, {
+              id: value.maxAttributeValueUnitCode,
+            });
+            if (findValue) {
+              value.maxUnitCodeName = findValue.unitCodeName;
+            }
+          }
+        }
+        item.values = findObj;
+      }
+    }
+
+    res.json(attribute.data);
   });
 };
 
