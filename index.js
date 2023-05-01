@@ -477,6 +477,35 @@ const startServer = async () => {
 
     res.json(attribute.data);
   });
+
+  app.get("/naver/keywordTags", async (req, res) => {
+    try {
+      const { keyword } = req.query;
+      if (!keyword) {
+        res.json([]);
+        return;
+      }
+      const token = await getToken();
+      if (!token) {
+        res.json([]);
+        return;
+      }
+      const keywrodTags = await axios({
+        url: `https://api.commerce.naver.com/external/v2/tags/recommend-tags?keyword=${encodeURI(
+          keyword
+        )}`,
+        method: "GET",
+        headers: {
+          Authorization: `${token.token_type} ${token.access_token}`,
+          "content-type": "application/json",
+        },
+      });
+      res.json(keywrodTags.data);
+    } catch (e) {
+      console.log("무슨 에러", e);
+      res.json([]);
+    }
+  });
 };
 
 startServer();
