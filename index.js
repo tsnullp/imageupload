@@ -422,34 +422,47 @@ const startServer = async () => {
       res.json([]);
       return;
     }
-    const attribute = await axios({
-      url: `https://api.commerce.naver.com/external/v1/product-attributes/attributes?categoryId=${categoryID}`,
-      method: "GET",
-      headers: {
-        Authorization: `${token.token_type} ${token.access_token}`,
-        "content-type": "application/json",
-      },
-    });
-    if (!attribute) {
-      res.json([]);
-      return;
+    let attribute = [];
+    try {
+      attribute = await axios({
+        url: `https://api.commerce.naver.com/external/v1/product-attributes/attributes?categoryId=${categoryID}`,
+        method: "GET",
+        headers: {
+          Authorization: `${token.token_type} ${token.access_token}`,
+          "content-type": "application/json",
+        },
+      });
+    } catch (e) {
+      console.log("attribute", e``);
     }
-    const attributeValue = await axios({
-      url: `https://api.commerce.naver.com/external/v1/product-attributes/attribute-values?categoryId=${categoryID}`,
-      method: "GET",
-      headers: {
-        Authorization: `${token.token_type} ${token.access_token}`,
-        "content-type": "application/json",
-      },
-    });
-    const unitValue = await axios({
-      url: `https://api.commerce.naver.com/external/v1/product-attributes/attribute-value-units`,
-      method: "GET",
-      headers: {
-        Authorization: `${token.token_type} ${token.access_token}`,
-        "content-type": "application/json",
-      },
-    });
+
+    let attributeValue = [];
+
+    try {
+      attributeValue = await axios({
+        url: `https://api.commerce.naver.com/external/v1/product-attributes/attribute-values?categoryId=${categoryID}`,
+        method: "GET",
+        headers: {
+          Authorization: `${token.token_type} ${token.access_token}`,
+          "content-type": "application/json",
+        },
+      });
+    } catch (e) {
+      console.log("attributeValue", e``);
+    }
+    let unitValue = [];
+    try {
+      unitValue = await axios({
+        url: `https://api.commerce.naver.com/external/v1/product-attributes/attribute-value-units`,
+        method: "GET",
+        headers: {
+          Authorization: `${token.token_type} ${token.access_token}`,
+          "content-type": "application/json",
+        },
+      });
+    } catch (e) {
+      console.log("unitValue", e``);
+    }
 
     for (const item of attribute.data) {
       const findObj = _.filter(attributeValue.data, {
