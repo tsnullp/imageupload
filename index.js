@@ -430,7 +430,10 @@ const startServer = async () => {
         "content-type": "application/json",
       },
     });
-
+    if (!attribute) {
+      res.json([]);
+      return;
+    }
     const attributeValue = await axios({
       url: `https://api.commerce.naver.com/external/v1/product-attributes/attribute-values?categoryId=${categoryID}`,
       method: "GET",
