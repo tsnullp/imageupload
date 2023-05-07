@@ -433,7 +433,9 @@ const startServer = async () => {
         },
       });
     } catch (e) {
-      console.log("attribute", e);
+      // console.log("attribute", e);
+      res.json([]);
+      return;
     }
 
     let attributeValue = [];
@@ -448,7 +450,7 @@ const startServer = async () => {
         },
       });
     } catch (e) {
-      console.log("attributeValue", e);
+      // console.log("attributeValue", e);
     }
     let unitValue = [];
     try {
@@ -461,7 +463,7 @@ const startServer = async () => {
         },
       });
     } catch (e) {
-      console.log("unitValue", e);
+      // console.log("unitValue", e);
     }
 
     for (const item of attribute.data) {
