@@ -14,6 +14,7 @@ const fetch = require("node-fetch");
 const gify = require("node-video-to-gif");
 const database = require("./database");
 const AccessToken = require("./models/AccessToken");
+const Brand = require("./models/Brand");
 const Cookie = require("./models/Cookie");
 const NaverMall = require("./models/naverMall");
 const NaverFavoriteItem = require("./models/NaverFavoriteItem");
@@ -411,6 +412,23 @@ const startServer = async () => {
     }
   });
 
+  app.get("/naver/brand", async (req, res) => {
+    try {
+      const brandList = await Brand.find(
+        {
+          brand: { $ne: null },
+        },
+        { brand: 1 }
+      );
+
+      const response = brandList.map((item) => item.brand.trim());
+      res.json(response);
+    } catch (e) {
+      // console.log("attribute", e);
+      res.json([]);
+      return;
+    }
+  });
   app.get("/naver/attribute", async (req, res) => {
     const { categoryID } = req.query;
     if (!categoryID) {
