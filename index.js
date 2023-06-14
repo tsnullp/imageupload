@@ -860,6 +860,7 @@ const searchNaverItem = async () => {
                   maxReview: 1000,
                   minPrice: 0,
                   maxPrice: 2000000,
+                  isJapan: item.seachLabel === 11,
                 });
 
                 // if (Array.isArray(response) && response.length > 0) {
