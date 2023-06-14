@@ -108,7 +108,6 @@ const find = async ({
 
           // if(originArea !== "일본") {
           if (originArea.includes("일본")) {
-            // console.log("isJapan", isJapan);
             if (isJapan) {
               if (isJapan) {
                 await NaverBestItem.findOneAndUpdate(
