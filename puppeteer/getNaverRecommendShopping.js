@@ -19,6 +19,7 @@ const find = async ({
   maxReview,
   minPrice,
   maxPrice,
+  isJapan,
 }) => {
   try {
     const userAgent = fakeUa();
@@ -106,37 +107,74 @@ const find = async ({
             : content.data.originAreaInfo.content;
 
           // if(originArea !== "일본") {
-          await NaverBestItem.findOneAndUpdate(
-            {
-              productNo: content.data.id,
-            },
-            {
-              $set: {
-                type: "best",
-                productNo: content.data.id,
-                displayName: content.data.channel.channelName,
-                productNo: content.data.id,
-                detailUrl: content.data.productUrl,
-                name,
-                title: name.replace(/ /gi, ""),
-                categoryId,
-                category1,
-                category2,
-                category3,
-                category4,
-                salePrice: content.data.salePrice,
-                image: content.data.productImages[0].url,
+          if (originArea.includes("일본")) {
+            if (isJapan) {
+              await NaverBestItem.findOneAndUpdate(
+                {
+                  productNo: content.data.id,
+                },
+                {
+                  $set: {
+                    type: "best",
+                    productNo: content.data.id,
+                    displayName: content.data.channel.channelName,
+                    productNo: content.data.id,
+                    detailUrl: content.data.productUrl,
+                    name,
+                    title: name.replace(/ /gi, ""),
+                    categoryId,
+                    category1,
+                    category2,
+                    category3,
+                    category4,
+                    salePrice: content.data.salePrice,
+                    image: content.data.productImages[0].url,
 
-                sellerTags,
-                reviewCount: content.data.reviewAmount.totalReviewCount,
-                originArea,
-              },
-            },
-            {
-              upsert: true,
-              new: true,
+                    sellerTags,
+                    reviewCount: content.data.reviewAmount.totalReviewCount,
+                    originArea,
+                  },
+                },
+                {
+                  upsert: true,
+                  new: true,
+                }
+              );
             }
-          );
+          } else {
+            await NaverBestItem.findOneAndUpdate(
+              {
+                productNo: content.data.id,
+              },
+              {
+                $set: {
+                  type: "best",
+                  productNo: content.data.id,
+                  displayName: content.data.channel.channelName,
+                  productNo: content.data.id,
+                  detailUrl: content.data.productUrl,
+                  name,
+                  title: name.replace(/ /gi, ""),
+                  categoryId,
+                  category1,
+                  category2,
+                  category3,
+                  category4,
+                  salePrice: content.data.salePrice,
+                  image: content.data.productImages[0].url,
+
+                  sellerTags,
+                  reviewCount: content.data.reviewAmount.totalReviewCount,
+                  originArea,
+                },
+              },
+              {
+                upsert: true,
+                new: true,
+              }
+            );
+          }
+
           // }
         }
       } catch (e) {
