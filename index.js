@@ -95,6 +95,9 @@ const startServer = async () => {
     })
   );
 
+  app.use(express.json({ limit: "500000mb" }));
+  app.use(express.urlencoded({ limit: "500000mb", extended: true }));
+
   app.use(morgan("dev"));
 
   // 포트 설정
