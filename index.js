@@ -19,6 +19,8 @@ const Cookie = require("./models/Cookie");
 const NaverMall = require("./models/naverMall");
 const NaverFavoriteItem = require("./models/NaverFavoriteItem");
 const NaverJapanItem = require("./models/NaverJapanItem");
+const NaverJapanreviewItem = require("./models/NaverJapanreviewItem");
+
 const GetSeasonKeyword = require("./puppeteer/getSeasonKeyword");
 const User = require("./models/User");
 const Basic = require("./models/Basic");
@@ -38,6 +40,7 @@ const {
   getToken,
 } = require("./lib/userFunc");
 const getNaverRecommendShopping = require("./puppeteer/getNaverRecommendShopping");
+const getNaverReviewShopping = require("./puppeteer/getNaverReviewShopping");
 const axios = require("axios");
 const tesseract = require("node-tesseract-ocr");
 
@@ -109,9 +112,17 @@ const startServer = async () => {
   //   console.log(`HTTP server listening on port ${5102}.`);
   // })
 
-  http.createServer(app).listen(httpPort, () => {
-    console.log(`HTTP server listening on port ${httpPort}.`);
-  });
+  http
+    .createServer((req, res) => {
+      // 요청 엔티티 크기 제한 설정
+      req.maxPayload = 10 * 1024 * 1024 * 1024; // 100MB
+
+      // 요청 처리
+      // ...
+    })
+    .listen(httpPort, () => {
+      console.log(`HTTP server listening on port ${httpPort}.`);
+    });
 
   app.post("/upload", async (req, res) => {
     try {
@@ -968,6 +979,100 @@ const searchNaverItem = async () => {
   }
 };
 
+const searchNaverJapanItem = async () => {
+  try {
+    const naverMalls = await NaverMall.aggregate([
+      {
+        $match: {
+          seachLabel: 11,
+        },
+      },
+    ]);
+    console.log("naverMalls", naverMalls.length);
+    let i = 1;
+    let naverMallsArray = DimensionArray(naverMalls, 1);
+    for (const items of naverMallsArray) {
+      console.log("product--> ", `${i++} / ${naverMallsArray.length}`);
+      try {
+        await sleep(500);
+
+        const promiseArray = items.map((item, index) => {
+          return new Promise(async (resolve, reject) => {
+            try {
+              // console.log("mallName", `${i * index * 20 + index} / ${naverMalls.length}`, item.mallName)
+              const response = await getNaverReviewShopping({
+                _id: item._id,
+                channelID: item.channelID,
+                url: item.mallPcUrl,
+              });
+              // console.log("response-->", response.productAttributes);
+              for (const product of response) {
+                console.log(
+                  "product **** ",
+                  product.brandName,
+                  " - ",
+                  product.name
+                );
+                // console.log(
+                //   "product--> ",
+                //   `${i++} / ${naverMallsArray.length}`,
+                //   product.name
+                // );
+                await NaverJapanreviewItem.findOneAndUpdate(
+                  {
+                    productNo: product.productNo,
+                  },
+                  {
+                    $set: {
+                      productNo: product.productNo,
+                      displayName: product.displayName,
+                      detailUrl: product.detailUrl,
+                      name: product.name,
+                      categoryId: product.categoryId,
+                      category1: product.category1,
+                      category2: product.category2,
+                      category3: product.category3,
+                      category4: product.category4,
+                      categoryName: product.categoryName,
+                      maxPrice: product.maxPrice,
+                      minPrice: product.minPrice,
+                      image: product.image,
+                      purchaseCnt: product.purchaseCnt,
+                      reviewCount: product.reviewCount,
+                      zzim: product.zzim,
+                      openDate: product.openDate,
+                      originArea: product.originArea,
+                      actionGrade: item.actionGrade,
+                      productAttributes: product.productAttributes,
+                      sellerTags: product.sellerTags,
+                      manufacturerName: product.manufacturerName,
+                      brandName: product.brandName,
+                      brandId: product.brandId,
+                      brandId: product.brandId,
+                      monthlyCnt: product.monthlyCnt,
+                    },
+                  },
+                  { upsert: true }
+                );
+              }
+              resolve();
+            } catch (e) {
+              console.log("Promise Error", e);
+              reject(e);
+            }
+          });
+        });
+        await Promise.all(promiseArray);
+      } catch (e) {
+        console.log("혹시 여기", e);
+      }
+    }
+
+    console.log("------------ 끝 -------------");
+  } catch (e) {
+    console.log("searchNaverJapanItem", e);
+  }
+};
 // GetSeasonKeyword({ keyword: "조립식닭장" })
 
 setTimeout(() => {
@@ -982,6 +1087,7 @@ setTimeout(() => {
   } catch (e) {}
   try {
     searchNaverItem();
+    // searchNaverJapanItem();
   } catch (e) {}
 }, 10000);
 
