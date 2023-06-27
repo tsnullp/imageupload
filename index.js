@@ -166,12 +166,14 @@ const startServer = async () => {
     try {
       const imageData = [];
       req.on("data", (chunk) => {
+        console.log("chunk--", chunk);
         imageData.push(chunk);
       });
 
       req.on("end", () => {
+        console.log("imageData", imageData);
         const imageBuffer = Buffer.concat(imageData);
-
+        console.log("imageBuffer", imageBuffer);
         const TODAY = moment().format("YYYYMMDD");
         const UPLOAD_FOLDER = path.join(DIR, UPLOAD);
         const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY);
