@@ -98,7 +98,7 @@ const startServer = async () => {
   app.use(express.json({ limit: "500000mb" }));
   app.use(express.urlencoded({ limit: "500000mb", extended: true }));
 
-  app.use(bodyParser.raw({ type: "application/octet-stream" }));
+  // app.use(bodyParser.raw({ type: "application/octet-stream" }));
 
   app.use(morgan("dev"));
 
