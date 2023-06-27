@@ -87,10 +87,10 @@ const startServer = async () => {
   );
 
   app.use(bodyParser.json());
-  app.use(bodyParser.json({ limit: "50000mb" }));
+  app.use(bodyParser.json({ limit: "500000mb" }));
   app.use(
     bodyParser.urlencoded({
-      limit: "50000mb",
+      limit: "500000mb",
       extended: true,
     })
   );
@@ -112,17 +112,9 @@ const startServer = async () => {
   //   console.log(`HTTP server listening on port ${5102}.`);
   // })
 
-  http
-    .createServer((req, res) => {
-      // 요청 엔티티 크기 제한 설정
-      req.maxPayload = 10 * 1024 * 1024 * 1024; // 100MB
-
-      // 요청 처리
-      // ...
-    })
-    .listen(httpPort, () => {
-      console.log(`HTTP server listening on port ${httpPort}.`);
-    });
+  http.createServer(app).listen(httpPort, () => {
+    console.log(`HTTP server listening on port ${httpPort}.`);
+  });
 
   app.post("/upload", async (req, res) => {
     try {
