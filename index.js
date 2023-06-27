@@ -98,6 +98,8 @@ const startServer = async () => {
   app.use(express.json({ limit: "500000mb" }));
   app.use(express.urlencoded({ limit: "500000mb", extended: true }));
 
+  app.use(bodyParser.raw({ type: "application/octet-stream" }));
+
   app.use(morgan("dev"));
 
   // 포트 설정
@@ -160,7 +162,45 @@ const startServer = async () => {
       res.status(500).send(err);
     }
   });
+  app.post("/upload-chunk", async (req, res) => {
+    try {
+      const imageData = [];
+      req.on("data", (chunk) => {
+        imageData.push(chunk);
+      });
 
+      req.on("end", () => {
+        const imageBuffer = Buffer.concat(imageData);
+
+        const TODAY = moment().format("YYYYMMDD");
+        const UPLOAD_FOLDER = path.join(DIR, UPLOAD);
+        const UPLOAD_FOLDER_TODAY = path.join(UPLOAD_FOLDER, TODAY);
+
+        !fs.existsSync(UPLOAD) && fs.mkdirSync(UPLOAD);
+        !fs.existsSync(UPLOAD_FOLDER) && fs.mkdirSync(UPLOAD_FOLDER);
+        !fs.existsSync(UPLOAD_FOLDER_TODAY) &&
+          fs.mkdirSync(UPLOAD_FOLDER_TODAY);
+
+        let randomStr = Math.random().toString(36).substring(2, 12);
+        let fileName = path.join(TODAY, `${randomStr}.jpg`);
+        while (fs.existsSync(path.join(UPLOAD_FOLDER, fileName))) {
+          randomStr = Math.random().toString(36).substring(2, 12);
+          fileName = path.join(TODAY, `${randomStr}.jpg`);
+        }
+        const FILE_DIR = path.join(UPLOAD_FOLDER, fileName);
+
+        fs.writeFileSync(FILE_DIR, imageBuffer);
+
+        res.send({
+          status: true,
+          message: "파일이 업로드 되었습니다.",
+          data: `https://tsnullp.chickenkiller.com/${TODAY}/${randomStr}.jpg`,
+        });
+      });
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
   app.post("/upload-multi", async (req, res) => {
     try {
       if (!req.body.base64strs) {
