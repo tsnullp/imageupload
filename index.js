@@ -121,6 +121,7 @@ const startServer = async () => {
 
   app.post("/upload", async (req, res) => {
     try {
+      console.log("request.files['file']", request.files);
       if (!req.body.base64str) {
         res.send({
           status: false,
