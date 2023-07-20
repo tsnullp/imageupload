@@ -906,6 +906,7 @@ const searchNaverItem = async () => {
                   minPrice: 0,
                   maxPrice: 2000000,
                   isJapan: item.seachLabel === 11,
+                  brandUrl: item.brandUrl,
                 });
 
                 // if (Array.isArray(response) && response.length > 0) {
