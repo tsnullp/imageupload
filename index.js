@@ -1015,97 +1015,193 @@ const searchNaverItem = async () => {
 };
 
 const searchNaverJapanItem = async () => {
+  while (true) {
+    try {
+      const naverMalls = await NaverMall.aggregate([
+        {
+          $match: {
+            // businessName: "뽀식재팬",
+            seachLabel: 11,
+          },
+        },
+      ]);
+      console.log("naverMalls", naverMalls.length);
+      let i = 1;
+      let naverMallsArray = DimensionArray(naverMalls, 1);
+
+      for (const items of naverMallsArray) {
+        console.log("product--> ", `${i++} / ${naverMallsArray.length}`);
+        try {
+          await sleep(500);
+
+          const promiseArray = items.map((item, index) => {
+            return new Promise(async (resolve, reject) => {
+              try {
+                // console.log("mallName", `${i * index * 20 + index} / ${naverMalls.length}`, item.mallName)
+                const response = await getNaverReviewShopping({
+                  _id: item._id,
+                  channelID: item.channelID,
+                  channelUid: item.channelUid,
+                  url: item.mallPcUrl,
+                });
+                // console.log("response-->", response);
+                for (const product of response) {
+                  console.log(
+                    "product **** ",
+                    product.brandName,
+                    " - ",
+                    product.name
+                  );
+                  // console.log(
+                  //   "product--> ",
+                  //   `${i++} / ${naverMallsArray.length}`,
+                  //   product.name
+                  // );
+                  await NaverJapanreviewItem.findOneAndUpdate(
+                    {
+                      productNo: product.productNo,
+                    },
+                    {
+                      $set: {
+                        productNo: product.productNo,
+                        displayName: product.displayName,
+                        detailUrl: product.detailUrl,
+                        name: product.name,
+                        categoryId: product.categoryId,
+                        category1: product.category1,
+                        category2: product.category2,
+                        category3: product.category3,
+                        category4: product.category4,
+                        categoryName: product.categoryName,
+                        maxPrice: product.maxPrice,
+                        minPrice: product.minPrice,
+                        image: product.image,
+                        purchaseCnt: product.purchaseCnt,
+                        reviewCount: product.reviewCount,
+                        zzim: product.zzim,
+                        openDate: product.openDate,
+                        originArea: product.originArea,
+                        actionGrade: item.actionGrade,
+                        productAttributes: product.productAttributes,
+                        sellerTags: product.sellerTags,
+                        manufacturerName: product.manufacturerName,
+                        brandName: product.brandName,
+                        brandId: product.brandId,
+                        brandId: product.brandId,
+                        monthlyCnt: product.monthlyCnt,
+                      },
+                    },
+                    { upsert: true }
+                  );
+                }
+                resolve();
+              } catch (e) {
+                console.log("Promise Error", e);
+                reject(e);
+              }
+            });
+          });
+          await Promise.all(promiseArray);
+        } catch (e) {
+          console.log("혹시 여기", e);
+        }
+      }
+
+      console.log("------------ 끝 -------------");
+    } catch (e) {
+      console.log("searchNaverJapanItem", e);
+    }
+  }
+};
+
+const getChannelID = async () => {
   try {
     const naverMalls = await NaverMall.aggregate([
       {
         $match: {
-          seachLabel: 11,
+          channelUid: null,
         },
+        // $sort: {
+        //   _id: 1,
+        // },
       },
     ]);
-    console.log("naverMalls", naverMalls.length);
-    let i = 1;
-    let naverMallsArray = DimensionArray(naverMalls, 1);
-    for (const items of naverMallsArray) {
-      console.log("product--> ", `${i++} / ${naverMallsArray.length}`);
-      try {
-        await sleep(500);
 
-        const promiseArray = items.map((item, index) => {
-          return new Promise(async (resolve, reject) => {
-            try {
-              // console.log("mallName", `${i * index * 20 + index} / ${naverMalls.length}`, item.mallName)
-              const response = await getNaverReviewShopping({
-                _id: item._id,
-                channelID: item.channelID,
-                url: item.mallPcUrl,
-              });
-              // console.log("response-->", response.productAttributes);
-              for (const product of response) {
+    console.log("cccc", naverMalls.length);
+    for (const items of DimensionArray(naverMalls, 20)) {
+      const promiseArray = items.map((item, index) => {
+        return new Promise(async (resolve, reject) => {
+          try {
+            const content = await axios.get(item.mallPcUrl);
+
+            const temp1 = content.data.split("window.__PRELOADED_STATE__=")[1];
+            const temp2 = temp1.split("<span")[0].trim();
+            const temp21 = temp2.split("</script>")[0].trim();
+
+            const jsObj = JSON.parse(temp21);
+            if (jsObj && jsObj.smartStoreV2) {
+              const { channel } = jsObj.smartStoreV2;
+              console.log(
+                "item.",
+                channel.id,
+                channel.channelName,
+                channel.channelUid
+              );
+              await NaverMall.findOneAndUpdate(
+                {
+                  _id: item._id,
+                },
+                {
+                  $set: {
+                    channelID: channel.id,
+                    channelUid: channel.channelUid,
+                  },
+                },
+                {
+                  upsert: true,
+                }
+              );
+            } else if (jsObj && jsObj.bsProductCollection) {
+              const bestProduts = jsObj.bsProductCollection.A.bestProducts;
+              if (bestProduts.length > 0) {
                 console.log(
-                  "product **** ",
-                  product.brandName,
-                  " - ",
-                  product.name
+                  "item.",
+                  bestProduts[0].channel.channelNo,
+                  bestProduts[0].channel.channelName,
+                  bestProduts[0].channel.channelUid
                 );
-                // console.log(
-                //   "product--> ",
-                //   `${i++} / ${naverMallsArray.length}`,
-                //   product.name
-                // );
-                await NaverJapanreviewItem.findOneAndUpdate(
+                await NaverMall.findOneAndUpdate(
                   {
-                    productNo: product.productNo,
+                    _id: item._id,
                   },
                   {
                     $set: {
-                      productNo: product.productNo,
-                      displayName: product.displayName,
-                      detailUrl: product.detailUrl,
-                      name: product.name,
-                      categoryId: product.categoryId,
-                      category1: product.category1,
-                      category2: product.category2,
-                      category3: product.category3,
-                      category4: product.category4,
-                      categoryName: product.categoryName,
-                      maxPrice: product.maxPrice,
-                      minPrice: product.minPrice,
-                      image: product.image,
-                      purchaseCnt: product.purchaseCnt,
-                      reviewCount: product.reviewCount,
-                      zzim: product.zzim,
-                      openDate: product.openDate,
-                      originArea: product.originArea,
-                      actionGrade: item.actionGrade,
-                      productAttributes: product.productAttributes,
-                      sellerTags: product.sellerTags,
-                      manufacturerName: product.manufacturerName,
-                      brandName: product.brandName,
-                      brandId: product.brandId,
-                      brandId: product.brandId,
-                      monthlyCnt: product.monthlyCnt,
+                      channelID: bestProduts[0].channel.channelNo,
+                      channelUid: bestProduts[0].channel.channelUid,
                     },
                   },
-                  { upsert: true }
+                  {
+                    upsert: true,
+                  }
                 );
               }
-              resolve();
-            } catch (e) {
-              console.log("Promise Error", e);
-              reject(e);
             }
-          });
+
+            await sleep(1000);
+
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
         });
-        await Promise.all(promiseArray);
-      } catch (e) {
-        console.log("혹시 여기", e);
-      }
+      });
+      await Promise.all(promiseArray);
+      await sleep(2000);
     }
 
-    console.log("------------ 끝 -------------");
+    console.log("----- 끝 -----");
   } catch (e) {
-    console.log("searchNaverJapanItem", e);
+    console.log("getChannelID error", e);
   }
 };
 // GetSeasonKeyword({ keyword: "조립식닭장" })
@@ -1122,9 +1218,10 @@ setTimeout(() => {
   } catch (e) {}
   try {
     searchNaverItem();
-    // searchNaverJapanItem();
+    searchNaverJapanItem();
+    // getChannelID();
   } catch (e) {}
-}, 10000);
+}, 1000);
 
 setInterval(async function () {
   try {

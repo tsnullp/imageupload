@@ -5,14 +5,16 @@ const _ = require("lodash");
 const smartStoreCategory = require("../models/smartStoreCategory");
 const { NaverKeywordRel } = require("../api/Naver");
 const { sleep, getSbth } = require("../lib/userFunc");
-const find = async ({ channelID, url }) => {
+
+const find = async ({ channelID, channelUid, url }) => {
   const userAgent = fakeUa();
 
   const productList = [];
   const japanProduct = [];
   try {
     const popularContent = await axios.get(
-      `https://smartstore.naver.com/i/v1/stores/${channelID}/categories/ALL/products?categoryId=ALL&categorySearchType=STDCATG&sortType=POPULAR&page=1&pageSize=80`,
+      `https://smartstore.naver.com/i/v2/channels/${channelUid}/categories/ALL/products?categorySearchType=DISPCATG&sortType=POPULAR&page=1&pageSize=80`,
+      // `https://smartstore.naver.com/i/v1/stores/${channelID}/categories/ALL/products?categoryId=ALL&categorySearchType=STDCATG&sortType=POPULAR&page=1&pageSize=80`,
       {
         headers: {
           "User-Agent": userAgent,
@@ -27,6 +29,7 @@ const find = async ({ channelID, url }) => {
         },
       }
     );
+
     for (const item of popularContent.data.simpleProducts) {
       if (!_.find(productList, { id: item.id })) {
         productList.push(item);
@@ -34,7 +37,8 @@ const find = async ({ channelID, url }) => {
     }
     await sleep(300);
     const totalSaleContent = await axios.get(
-      `https://smartstore.naver.com/i/v1/stores/${channelID}/categories/ALL/products?categoryId=ALL&categorySearchType=STDCATG&sortType=TOTALSALE&page=1&pageSize=80`,
+      `https://smartstore.naver.com/i/v2/channels/${channelUid}/categories/ALL/products?categorySearchType=DISPCATG&sortType=TOTALSALE&page=1&pageSize=80`,
+      // `https://smartstore.naver.com/i/v1/stores/${channelID}/categories/ALL/products?categoryId=ALL&categorySearchType=STDCATG&sortType=TOTALSALE&page=1&pageSize=80`,
       {
         headers: {
           "User-Agent": userAgent,
@@ -56,7 +60,8 @@ const find = async ({ channelID, url }) => {
     }
     await sleep(300);
     const reviewContent = await axios.get(
-      `https://smartstore.naver.com/i/v1/stores/${channelID}/categories/ALL/products?categoryId=ALL&categorySearchType=STDCATG&sortType=REVIEW&page=1&pageSize=80`,
+      `https://smartstore.naver.com/i/v2/channels/${channelUid}/categories/ALL/products?categorySearchType=DISPCATG&sortType=REVIEW&page=1&pageSize=80`,
+      // `https://smartstore.naver.com/i/v1/stores/${channelID}/categories/ALL/products?categoryId=ALL&categorySearchType=STDCATG&sortType=REVIEW&page=1&pageSize=80`,
       {
         headers: {
           "User-Agent": userAgent,
@@ -83,7 +88,9 @@ const find = async ({ channelID, url }) => {
     //   // console.log("item--", item);
     //   productList.push(item);
     // }
-  } catch (e) {}
+  } catch (e) {
+    console.log("eeeee", e);
+  }
 
   // console.log("productList", productList);
   for (const item of productList) {

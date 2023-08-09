@@ -1,11 +1,12 @@
-const mongoose = require("mongoose")
-const moment = require("moment")
+const mongoose = require("mongoose");
+const moment = require("moment");
 
 const NaverMall = mongoose.Schema({
   mallNo: String,
   mallName: String,
   mallPcUrl: String,
   channelID: String,
+  channelUid: String,
   brandUrl: String,
   seachLabel: Number,
   businessName: String,
@@ -25,6 +26,6 @@ const NaverMall = mongoose.Schema({
   },
   productCount: Number,
   saleCount: Number,
-})
+});
 
-module.exports = mongoose.model("NaverMall", NaverMall)
+module.exports = mongoose.model("NaverMall", NaverMall);
