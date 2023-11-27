@@ -20,7 +20,7 @@ const NaverMall = require("./models/naverMall");
 const NaverFavoriteItem = require("./models/NaverFavoriteItem");
 const NaverJapanItem = require("./models/NaverJapanItem");
 const NaverJapanreviewItem = require("./models/NaverJapanreviewItem");
-
+const BrandKeyword = require("./models/BrandKeyword");
 const GetSeasonKeyword = require("./puppeteer/getSeasonKeyword");
 const User = require("./models/User");
 const Basic = require("./models/Basic");
@@ -31,6 +31,7 @@ const nodeBase64 = require("nodejs-base64-converter");
 const request = require("request-promise-native");
 const {
   sleep,
+  ranking,
   checkStr,
   regExp_test,
   imageCheck,
@@ -38,11 +39,13 @@ const {
   getAppDataPath,
   DimensionArray,
   getToken,
+  getSbth,
 } = require("./lib/userFunc");
 const getNaverRecommendShopping = require("./puppeteer/getNaverRecommendShopping");
 const getNaverReviewShopping = require("./puppeteer/getNaverReviewShopping");
 const axios = require("axios");
 const tesseract = require("node-tesseract-ocr");
+const { NaverKeywordRel } = require("./api/Naver");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
@@ -1204,6 +1207,688 @@ const getChannelID = async () => {
     console.log("getChannelID error", e);
   }
 };
+
+const getBrandSales = async () => {
+  try {
+    const brandKeywords = [
+      "이세이미야케미",
+      "알라딘",
+      "오어슬로우",
+      "NIKKEN",
+      "요넥스",
+      "윌슨",
+      "오니츠카타이거",
+      "닌텐도",
+      "웨어하우스",
+      "테일러메이드",
+      "컨버스",
+      "미즈노",
+      "KEEN",
+      "ARTISAN",
+      "문스타",
+      "헌터",
+      "아슬레타",
+      "CICIBELLA 마스크",
+      "스노우피크",
+      "KIRIN",
+      "타이틀리스트",
+      "아사히카세이",
+      "비비안웨스트우드",
+      "무인양품",
+      "호카오네오네",
+      "풀카운트",
+      "4w1h",
+      "WBSJ",
+      "반스",
+      "산요",
+      "Yamazaki",
+      "아레나",
+      "푸마",
+      "포켓몬스터",
+      "토요토미",
+      "LION",
+      "snow peak",
+      "에포크",
+      "씨빅",
+      "플리츠플리즈",
+      "파나소닉",
+      "DOD",
+      "캘러웨이",
+      "소리야나기",
+      "써코니",
+      "프릭스스토어",
+      "소토",
+      "콜맨",
+      "바볼랏",
+      "코닥",
+      "오디세이",
+      "노다호로",
+      "우스하리",
+      "니들스",
+      "버즈릭슨",
+      "스투시",
+      "미노야끼",
+      "BARNS OUTFITTERS",
+      "Wilson",
+      "야마자키",
+      "교세라",
+      "이와타니",
+      "토이즈맥코이",
+      "후지필름",
+      "mizuho",
+      "wanderout",
+      "로제트",
+      "젝시오",
+      "짐빔",
+      "KAIKAI KIKI",
+      "써모스",
+      "Maiko",
+      "앰비",
+      "고세",
+      "이사미",
+      "프랑프랑",
+      "나가노",
+      "와이엠씨엘케이와이",
+      "라바제",
+      "오라리",
+      "F/CE",
+      "마가렛호웰",
+      "요시카와",
+      "소후란",
+      "Miffy",
+      "원더아웃",
+      "포터",
+      "마츠나가",
+      "스탬플",
+      "화이츠빌",
+      "사나",
+      "요시히로",
+      "소니",
+      "혼마",
+      "미이세이미야케",
+      "Ambai",
+      "옵텍스",
+      "유니프레임",
+      "꼼데가르송",
+      "챔피온",
+      "레노아",
+      "버켄스탁",
+      "펠리칸",
+      "타비오",
+      "오디너리핏츠",
+      "38explore",
+      "에버뉴",
+      "KUREHA",
+      "프리휠러스",
+      "캡틴스태그",
+      "BEAMS",
+      "노스페이스",
+      "야마하",
+      "란도린",
+      "PXG",
+      "PILOT",
+      "NEEDLES",
+      "이와키",
+      "VIEW",
+      "미즈호",
+      "엔지니어드가먼츠",
+      "노르디스크",
+      "살로몬",
+      "FREAKS STORE",
+      "뉴에라",
+      "니콘",
+      "WHATNOT",
+      "플레이스테이션",
+      "미 이세이미야케",
+      "Silky",
+      "신존",
+      "크록스",
+      "써모스(THERMOS)",
+      "엔젤하트",
+      "브리지스톤",
+      "Hender Scheme",
+      "아에타",
+      "아웃스탠딩",
+      "키와메",
+      "사브리나",
+      "Niko and",
+      "WPC",
+      "발리스틱스",
+      "네이탈 디자인",
+      "FAFA",
+      "네이버후드",
+      "irma",
+      "콜맨(Coleman)",
+      "엠펙스",
+      "헤드",
+      "번독",
+      "혼마제작소",
+      "토르",
+      "노스페이스퍼플라벨",
+      "풋조이",
+      "디젤",
+      "KTC",
+      "솔텍",
+      "라이온",
+      "오르치발",
+      "아리타",
+      "고신",
+      "겐타",
+      "타케이",
+      "펜텔",
+      "에비스",
+      "아뜰리에 페넬로페",
+      "스피도",
+      "요시다포터",
+      "레졸루트",
+      "토모에리버",
+      "럭실론",
+      "FRANCFRANC",
+      "리첼",
+      "우포스",
+      "버터플라이",
+      "아리타야끼",
+      "엘레컴",
+      "카웨코",
+      "네루 디자인 웍스",
+      "SOUTH2 WEST8",
+      "코신",
+      "첨스",
+      "유니클로",
+      "클리브랜드",
+      "LEC",
+      "니혼코도",
+      "포틴",
+      "PEANUTS",
+      "Thor",
+      "씨게이트",
+      "칼리타",
+      "DAD 가르송",
+      "아사히슈즈",
+      "리얼맥코이",
+      "devise works",
+      "COMOLI",
+      "아시모크래프트",
+      "RICOH",
+      "DANTON",
+      "Gourmandise",
+      "조지루시",
+      "Kosin",
+      "소우소우",
+      "츠키우사기지루시",
+      "굿온",
+      "테크니화이버",
+      "닛토",
+      "시마노",
+      "닛타쿠",
+      "하루타",
+      "베이프",
+      "트리빗",
+      "베이크루",
+      "토리베",
+      "샤프톤",
+      "바커스",
+      "로지텍",
+      "레어잼",
+      "에어버기",
+      "세이코",
+      "Etimo",
+      "플래닛",
+      "르탈론",
+      "아미아칼바",
+      "다이와",
+      "몽벨",
+      "고든밀러",
+      "발뮤다",
+      "kapital",
+      "스누피",
+      "앤드원더",
+      "바직",
+      "nanamica",
+      "가라대관",
+      "카시라",
+      "wpc",
+      "45R",
+      "하사미야끼",
+      "텐트마크",
+      "가오바부",
+      "오레고니안 캠퍼",
+      "GU",
+      "화이텐",
+      "핑",
+      "시모무라",
+      "기모토유리",
+      "BRID",
+      "NESTOUT",
+      "Loto",
+      "니키",
+      "FREEWHEELERS",
+      "neru design works",
+      "카시오",
+      "mature ha",
+      "오판츄우사기",
+      "CIELO",
+      "andwander",
+      "BoYata",
+      "auralee",
+      "와코마리아",
+      "헬리오스",
+      "와콤",
+      "브리타",
+      "asics",
+      "부코",
+      "노사쿠",
+      "KOGU",
+      "TITAN MANIA",
+      "노티카",
+      "mhl",
+      "암바이",
+      "가르송 DAD",
+      "엘엘빈",
+      "콜드스틸",
+      "racal",
+      "발리스틱스 BALLISTICS",
+      "헬리녹스",
+      "comoli",
+      "슈가케인",
+      "마운틴리서치",
+      "asimocrafts",
+      "블루보틀",
+      "HYSTERIC GLAMOUR",
+      "스케이터",
+      "SEIKO",
+      "스카르파",
+      "베어본즈리빙",
+      "안테프리마",
+      "BUCO",
+      "aeta",
+      "오노에",
+      "데상트",
+      "딘앤델루카",
+      "로스앤젤레스 어패럴",
+      "FIELDOOR",
+      "키지마타카유키",
+      "미 이세이미아케",
+      "카이코",
+      "EMPEX",
+      "아오야마",
+      "DAIWA PIER39",
+      "danton",
+      "와헤이 프레이즈",
+      "뷰",
+      "YUPITERU",
+      "아이자와공방",
+      "EPON",
+      "캠버",
+      "도돌",
+      "카베코",
+      "BELCA",
+      "Wahei freiz",
+      "ADERIA",
+      "텐트마크디자인",
+      "오딧세이",
+      "지포어",
+      "Ohuhu",
+      "에치젠칠기",
+      "기무라 글라스",
+      "리바이스",
+      "MIMI Berry",
+      "캡틴선샤인",
+      "SALOMON",
+      "하야시야",
+      "HUMANMADE",
+      "하리오",
+      "로고스",
+      "38explore 미야익스플로러",
+      "클리블랜드",
+      "Sasquatchfabrix",
+      "피그벨",
+      "Living Talk",
+      "39아리타",
+      "BOSS",
+      "닷사이",
+      "골드짐",
+      "소니뮤직",
+      "HARDLY-DRIVEABLE",
+      "Kiwame",
+      "AMIACALVA",
+      "GreenBell",
+      "유키시오",
+      "야마모토",
+      "데스포르치",
+      "KAI",
+      "MIZUNO(ミズノ)",
+      "바차리스",
+      "카메노코",
+      "MOONSTAR",
+      "와헤이",
+      "BEAMS PLUS",
+      "FX-AUDIO-",
+      "QUICKCAMP",
+      "미나페르호넨",
+      "그립스와니",
+      "퓨마",
+      "Toyo",
+      "daiwa",
+      "SHAPTON",
+      "south2 west8",
+      "The REAL McCOYS",
+      "SSK",
+      "AURALEE",
+      "Hario",
+      "하츠키",
+      "GLADHAND",
+      "뷰 블레이드F",
+      "워너뮤직재팬",
+      "나탈 디자인 NATAL DESIGN",
+      "ZANEARTS 제인아츠",
+      "몰텐",
+      "이스트팩",
+      "엔지니어(ENGINEER)",
+      "컨버스 재팬",
+      "butterfly",
+      "미즈노골프",
+      "타이온",
+      "RHODOLIRION",
+      "헨더스킴",
+      "cableami",
+      "oma factory",
+      "지포",
+      "YAMASHITA",
+      "CHACOLI",
+      "홀베인",
+      "KIJIMA",
+      "CASIO",
+      "RANDA",
+      "Veritecoeur",
+      "타니타",
+      "츠보타",
+      "로트링",
+      "킨",
+      "시마노 (SHIMANO)",
+      "이하다",
+      "칼하트",
+      "브릿지스톤",
+      "캐피탈",
+      "프록슨",
+      "빅타스",
+      "오레고니안 캠퍼 Oregonian Camper",
+      "THRASHER",
+      "스릭슨",
+      "에티모",
+      "이세이미야케미",
+      "SOTO X MOGOTI",
+      "먼싱웨어",
+      "KINTO",
+      "시비",
+      "디바이스웍스 DEVISE WORKS",
+      "릿첼",
+      "타카기",
+      "레이메이",
+      "Wpc.",
+      "KORG",
+      "아스레타",
+      "아케보노",
+      "헹켈",
+      "던롭",
+      "KAPITAL",
+      "Gamakatsu",
+      "포터클래식",
+      "NATAL DESIGN",
+      "타이거-K",
+      "타지마 글라스",
+      "벨카",
+      "디베르그",
+      "WHITESVILLE",
+      "yamashita",
+      "아나토미카",
+      "FUJIFILM",
+      "ONOE",
+      "INOUT",
+      "Captain Stag",
+      "ARTS & SCIENCE",
+      "유니프레임 uniflame",
+      "STUDIO D'ARTISAN",
+      "HAWKINS",
+      "하사미소",
+      "HARIO",
+      "WILSON",
+      "Dulton",
+      "이가모노",
+      "MHL",
+      "AKIKOAOKI",
+      "엔지니어",
+      "호보니치",
+      "neru design works 네루디자인웍스",
+      "HUNTER",
+      "질스튜어트",
+      "Artisan",
+      "카브엠트",
+      "후지쿠라",
+      "PORTER CLASSIC",
+      "제브라",
+      "BUZZ RICKSONS",
+      "지아니끼아리니",
+      "JOE MCCOY'S",
+      "THE REAL McCOYS",
+      "CAMP OOPARTS",
+      "LOCKFIELD EQUIPMENT 락필드 에큅먼트",
+      "이와키 iwaki",
+      "PRGR",
+      "DOSHISHA",
+      "mature ha.",
+      "URBAN RESEARCH Sonny Label",
+      "TIGER 타이거",
+      "REAL McCOYS",
+      "AbuGarcia",
+      "Insole Pro",
+      "nemo",
+      "야마코",
+      "빅토리녹스",
+      "Zamst",
+      "산조 코무텐",
+      "토이즈 맥코이",
+      "MARKA",
+      "GULL",
+      "FREAK'S STORE",
+      "조맥코이",
+      "Kai",
+      "zanearts",
+      "SIERRA DESIGNS",
+      "벨몬트",
+      "JOURNAL STANDARD",
+      "무민",
+      "반스아웃피터스",
+      "파커아사히",
+      "OIGEN",
+      "찰스앤키스",
+      "프록스",
+      "데상트골프",
+      "Ateliers penelope",
+      "바토너",
+      "ZETT",
+      "야마시타",
+      "토레이",
+      "쯔리겐",
+      "오즈리",
+      "사사메",
+      "메가배스",
+      "가마가츠",
+      "썬라인",
+      "키자쿠라",
+      "SRIXON",
+      "XXIO",
+      "HONMA",
+      "마루망",
+      "브릿지스톤",
+      "투어스테이지",
+      "그랑프리",
+      "포틴",
+      "히로마쓰모토",
+    ];
+
+    const getShoppingList = async (keyword) => {
+      let pages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      let shoppingList = [];
+      let brand = null;
+      let brandNo = null;
+      let purchaseCnt = 0;
+      let totalPrice = 0;
+      try {
+        const response = await NaverKeywordRel({
+          keyword: keyword,
+        });
+        let monthlyCnt = 0;
+        let overSeeCount = 0;
+        let totalCount = 0;
+
+        if (response && response.keywordList) {
+          isLoading = false;
+
+          const findObj = _.find(response.keywordList, {
+            relKeyword: keyword,
+          });
+          if (findObj) {
+            let monthlyPcQcCnt = Number(
+              findObj.monthlyPcQcCnt.toString().replace("< ", "")
+            );
+            let monthlyMobileQcCnt = Number(
+              findObj.monthlyMobileQcCnt.toString().replace("< ", "")
+            );
+            monthlyCnt = monthlyPcQcCnt + monthlyMobileQcCnt;
+          }
+        }
+
+        for (const page of pages) {
+          try {
+            await sleep(2000);
+            const shoppingResponse = await axios.get(
+              `https://search.shopping.naver.com/api/search/all?eq=&frm=NVSHOVS&iq=&&pagingIndex=${page}&pagingSize=80&productSet=overseas&query=${encodeURI(
+                keyword
+              )}&sort=rel&viewType=list&window=&xq=`,
+              {
+                headers: {
+                  "User-Agent":
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36",
+                  "sec-fetch-site": "same-origin",
+                  "sec-fetch-mode": "cors",
+                  "Accept-Encoding": "gzip, deflate, br",
+                  Connection: "keep-alive",
+                  "Cache-Control": "no-cache",
+                  Pragma: "no-cache",
+                  Expires: "0",
+                  referer: `https://search.shopping.naver.com/`,
+                  sbth: getSbth(),
+                },
+              }
+            );
+
+            if (page === 1) {
+              totalCount = shoppingResponse.data.shoppingResult.orgQueryTotal;
+              overSeeCount = shoppingResponse.data.shoppingResult.total;
+            }
+
+            let purchaseProducts =
+              shoppingResponse.data.shoppingResult.products.filter(
+                (item) => item.purchaseCnt > 0
+              );
+            if (purchaseProducts.length > 0) {
+              shoppingList.push(
+                ...shoppingResponse.data.shoppingResult.products
+              );
+            }
+          } catch (e) {}
+        }
+
+        // // BrandKeyword
+
+        const brandArr = shoppingList
+          .filter((item) => item.brand.length > 0 && item.brandNo.length > 0)
+          .map((item) => item.brand);
+        // console.log("brandArr", brandArr);
+        const brandRanking = ranking(brandArr);
+
+        if (brandRanking && brandRanking.length > 0) {
+          brand = brandRanking[0].name;
+          const temp = shoppingList.filter(
+            (item) => item.brand === brand && item.brandNo.length > 0
+          );
+          if (temp.length > 0) {
+            brandNo = temp[0].brandNo;
+          }
+        }
+
+        shoppingList.map((item) => {
+          purchaseCnt += item.purchaseCnt;
+          totalPrice += item.purchaseCnt * item.lowPrice;
+        });
+
+        return {
+          brand,
+          brandNo,
+          purchaseCnt,
+          totalPrice,
+          overSeeCount,
+          totalCount,
+          monthlyCnt,
+          searchRate: Number(((monthlyCnt / totalCount) * 100).toFixed(2)) || 0,
+          overSerRate:
+            Number(((overSeeCount / totalCount) * 100).toFixed(2)) || 0,
+        };
+      } catch (e) {
+        console.log("eee", e);
+      }
+    };
+    let i = 1;
+    for (const keyword of brandKeywords) {
+      console.log(
+        "keywrod 시작 --> ",
+        i++,
+        "/",
+        brandKeywords.length,
+        " ",
+        keyword
+      );
+      let response = await getShoppingList(keyword);
+
+      if (response && response.brand !== keyword) {
+        response = await getShoppingList(response.brand);
+      }
+      console.log(response);
+      if (response && response.brandNo) {
+        await BrandKeyword.findOneAndUpdate(
+          {
+            brand: response.brand,
+            brandNo: response.brandNo,
+          },
+          {
+            $set: {
+              brand: response.brand,
+              brandNo: response.brandNo,
+              purchaseCnt: response.purchaseCnt,
+              totalPrice: response.totalPrice,
+              overSeeCount: response.overSeeCount,
+              totalCount: response.totalCount,
+              monthlyCnt: response.monthlyCnt,
+              searchRate: response.searchRate,
+              overSerRate: response.overSerRate,
+              type: "일반",
+            },
+          },
+          {
+            upsert: true,
+          }
+        );
+      }
+
+      await sleep(2000);
+    }
+
+    console.log("--------- 끝 -----------");
+  } catch (e) {
+    console.log("getBrandSales ", e);
+  }
+};
 // GetSeasonKeyword({ keyword: "조립식닭장" })
 
 setTimeout(() => {
@@ -1217,9 +1902,10 @@ setTimeout(() => {
     getAccessTokenWithRefreshToken3();
   } catch (e) {}
   try {
-    searchNaverItem();
-    searchNaverJapanItem();
+    // searchNaverItem();
+    // searchNaverJapanItem();
     // getChannelID();
+    // getBrandSales();
   } catch (e) {}
 }, 1000);
 
