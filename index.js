@@ -55,9 +55,9 @@ const CLIENT_ID3 = "seY7sh5SWCqDtzGmLZboyH";
 const SECRET_KEY1 = "M8UFmAzlK50jVYCMXqrTjD";
 const SECRET_KEY2 = "pOMhnUDuGFxgEekaw10IgE";
 const SECRET_KEY3 = "NOq7vE2iIx2ouflwWEV2ID";
-const REDIRECT_URL1 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak1";
-const REDIRECT_URL2 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak2";
-const REDIRECT_URL3 = "https://tsnullp.chickenkiller.com/cafe24/token/callbak3";
+const REDIRECT_URL1 = "http://124.57.134.137:5101/cafe24/token/callbak1";
+const REDIRECT_URL2 = "http://124.57.134.137:5101/cafe24/token/callbak2";
+const REDIRECT_URL3 = "http://124.57.134.137:5101/cafe24/token/callbak3";
 let mallid;
 
 const startServer = async () => {
